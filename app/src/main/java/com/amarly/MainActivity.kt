@@ -29,21 +29,43 @@ import com.amarly.ui.theme.AmarlyTheme
 import com.amarly.ui.theme.Black
 import com.example.amarly.R
 import androidx.core.graphics.drawable.toDrawable
+import com.amarly.timer.FRIDAY
+import com.amarly.timer.MONDAY
+import com.amarly.timer.THURSDAY
+import com.amarly.timer.TUESDAY
+import com.amarly.timer.TimerActivity
+import com.amarly.timer.TimerData
+import com.amarly.timer.TimerFragment
+import com.amarly.timer.WEDNESDAY
+import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val timer : TimerActivity = TimerActivity()
         setContent {
             AmarlyTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    timer.Alarm(
-                        name = stringResource(R.string.timer_title),
-                        modifier = Modifier.padding(innerPadding)
-                                          // .fillMaxSize()
-                                            .statusBarsPadding(),
-                    )
+
+                        val timers = listOf(
+
+                            TimerData(
+                                message = "Get ready for the train",
+                                activeDays = MONDAY or WEDNESDAY or FRIDAY,
+                                dateTime = Calendar.getInstance(),
+                                enabledInitial = true
+                            ),
+
+                            TimerData(
+                                message = "Morning workout",
+                                activeDays = TUESDAY or THURSDAY,
+                                dateTime = Calendar.getInstance(),
+                                enabledInitial = false
+                            )
+                        )
+                        val x = innerPadding
+
+                        TimerActivity.TimerList(timers, modifier = Modifier.padding(innerPadding))
                 }
             }
         }
