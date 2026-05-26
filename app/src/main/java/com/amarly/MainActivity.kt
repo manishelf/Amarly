@@ -1,7 +1,5 @@
 package com.amarly
 
-import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,6 +18,7 @@ import androidx.compose.ui.Modifier
 import com.amarly.data.TimerData.TimerData
 import com.amarly.ui.theme.AmarlyTheme
 import com.amarly.ui.timer.Timer
+import java.util.Calendar
 
 
 class MainActivity : ComponentActivity() {
@@ -28,21 +27,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val rm = RingtoneManager(this)
-            rm.setType(RingtoneManager.TYPE_ALL);
-            val cursor = rm.cursor
-            val sounds = HashMap<String, Uri>()
-            while (cursor.moveToNext()) {
-                val title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX)
-                val uriStr = cursor.getString(RingtoneManager.URI_COLUMN_INDEX)
-                val uri = Uri.parse(
-                    uriStr + "/" +
-                            cursor.getString(RingtoneManager.ID_COLUMN_INDEX)
-                )
-                sounds.put(title, uri)
-            }
+
             val timers = remember() {
-                mutableStateListOf<TimerData>()
+                mutableStateListOf<TimerData>(
+                    TimerData(
+                        0,
+                        Calendar.getInstance(),
+                        0,
+                    )
+                )
             }
 
             var displayTimePicker by remember() {
@@ -69,6 +62,7 @@ class MainActivity : ComponentActivity() {
                             innerPadding
                         ),
                         timers,
+                        deleteHandler = { timers.remove(it) }
                     )
 
                     if (displayTimePicker) {

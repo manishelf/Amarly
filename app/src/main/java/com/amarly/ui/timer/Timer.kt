@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,9 +53,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.amarly.data.TimerData.TimerData
 import com.amarly.data.TimerData.TimerType
@@ -64,13 +69,15 @@ import com.amarly.ui.theme.GRAYISH_WHITE
 import com.amarly.ui.theme.WHITE
 import com.example.amarly.R
 import java.util.Calendar
+import kotlin.math.roundToInt
 
 object Timer {
 
     @Composable
     fun TopBar(timers: List<TimerData>, modifier: Modifier = Modifier) {
+        // TODO:
         Text(
-            "Amarly"
+            ""
         )
     }
 
@@ -201,9 +208,9 @@ object Timer {
     }
 
     @Composable
-    fun TimerTime(mdofier: Modifier = Modifier, triggerTime: Calendar) {
+    fun TimerTime(modifier: Modifier = Modifier, triggerTime: Calendar) {
         Row(
-            mdofier,
+            modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
             val hour = String.format("%02d", triggerTime.get(Calendar.HOUR))
@@ -239,6 +246,7 @@ object Timer {
 
     @Composable
     fun TimerMessage(modifier: Modifier = Modifier, text: String) {
+        // TODO:
         Text(
             text = text,
             modifier = modifier
@@ -249,36 +257,125 @@ object Timer {
     fun Timer(modifier: Modifier = Modifier, state: TimerData) {
         Card(modifier) {
             TimerActiveDays(
-                modifier.absolutePadding(5.dp, 15.dp, 5.dp, 0.dp),
+                Modifier.padding(10.dp),
                 state.activeDays,
                 state.type
             )
-            Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TimerTime(modifier, state.triggerTime)
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .absolutePadding(10.dp, 0.dp, 10.dp, 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TimerTime(triggerTime = state.triggerTime)
                 Switch(
                     checked = state.enabled,
                     onCheckedChange = { newState ->
                         state.enabled = newState
                     },
-                    modifier
                 )
             }
-            TimerMessage(modifier, state.message)
+            if (!state.message.isEmpty()) {
+                TimerMessage(Modifier, state.message)
+            }
         }
     }
 
     @Composable
-    fun TimerList(modifier: Modifier = Modifier, timers: List<TimerData>) {
-        LazyColumn(
-            modifier = modifier
+    fun TimerWithDelete(
+        timer: TimerData,
+        onDelete: (TimerData) -> Unit
+    ) {
+        val shape = RoundedCornerShape(20.dp)
+
+        var offsetX by remember {
+            mutableFloatStateOf(0f)
+        }
+
+        val maxRevealPx = with(LocalDensity.current) {
+            80.dp.toPx()
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .clip(shape)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
         ) {
-            items(timers) { timer ->
-                Timer(
+
+            // BACKGROUND DELETE BUTTON
+            Row(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Button(
+                    onClick = { onDelete(timer) },
                     modifier = Modifier
-                        .padding(
-                            10.dp, 2.dp
-                        ),
-                    timer
+                        .fillMaxHeight()
+                        .width(80.dp),
+                    shape = RectangleShape
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.delete_24px),
+                        contentDescription = "Delete",
+                    )
+                }
+            }
+
+            // FOREGROUND CARD
+            Card(
+                shape = shape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset {
+                        IntOffset(offsetX.roundToInt(), 0)
+                    }
+                    .pointerInput(Unit) {
+
+                        detectHorizontalDragGestures(
+
+                            onHorizontalDrag = { _, dragAmount ->
+
+                                offsetX =
+                                    (offsetX + dragAmount)
+                                        .coerceIn(-maxRevealPx, 0f)
+                            },
+
+                            onDragEnd = {
+
+                                offsetX =
+                                    if (offsetX < -maxRevealPx / 2)
+                                        -maxRevealPx
+                                    else
+                                        0f
+                            }
+                        )
+                    }
+            ) {
+                Timer(
+                    modifier = Modifier,
+                    state = timer
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun TimerList(
+        modifier: Modifier = Modifier,
+        timers: List<TimerData>,
+        deleteHandler: (item: TimerData) -> Unit
+    ) {
+        LazyColumn(modifier = modifier) {
+            items(timers) { timer ->
+                TimerWithDelete(
+                    timer = timer,
+                    onDelete = deleteHandler
                 )
             }
         }
@@ -307,14 +404,17 @@ object Timer {
         onConfirm: (TimerData) -> Unit = {},
         onDismiss: () -> Unit = {}
     ) {
+        val currTime = Calendar.getInstance()
         val timePickerState = rememberTimePickerState(
-            initialHour = 12,
-            initialMinute = 0,
+            initialHour = currTime.get(Calendar.HOUR_OF_DAY),
+            initialMinute = currTime.get(Calendar.MINUTE),
             is24Hour = false
         )
+        var timePickerMode by remember { mutableStateOf(true) }
+
         var message = rememberTextFieldState("");
         var activeDays by remember {
-            mutableIntStateOf(0)
+            mutableIntStateOf(1 shl (currTime.get(Calendar.DAY_OF_WEEK) - 1))
         }
         var ringtoneUri by remember {
             mutableStateOf(Uri.EMPTY)
@@ -341,6 +441,15 @@ object Timer {
             }
         }
         AlertDialog(
+            modifier = Modifier.pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onHorizontalDrag = { _, _ ->
+                    },
+                    onDragEnd = {
+                        timePickerMode = !timePickerMode
+                    }
+                )
+            },
             onDismissRequest = onDismiss,
             text = {
                 Column(
@@ -348,17 +457,22 @@ object Timer {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    androidx.compose.material3.TimePicker(
-                        state = timePickerState
-                    )
+                    if (timePickerMode) {
+                        androidx.compose.material3.TimePicker(state = timePickerState)
+                    } else {
+                        androidx.compose.material3.TimeInput(state = timePickerState)
+                    }
+
                     TextField(
                         message,
                         lineLimits = TextFieldLineLimits.SingleLine,
                         inputTransformation = InputTransformation.maxLength(30),
-                        placeholder = { Text("Title") }
+                        placeholder = { Text("Title") },
+                        modifier = Modifier.absolutePadding(0.dp, 0.dp, 0.dp, 10.dp)
                     )
                     TimerActiveDaysInput(
-                        modifier,
+                        Modifier.absolutePadding(0.dp, 0.dp, 0.dp, 5.dp),
+                        currActiveDays = activeDays,
                         onChange = { activeDaysIn ->
                             activeDays = activeDaysIn
                         }
