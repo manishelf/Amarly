@@ -1,6 +1,6 @@
 package com.amarly.service
 
-import com.amarly.data.TimerData.TimerData
+import com.amarly.data.TimerD.TimerData
 
 
 object TimerService {

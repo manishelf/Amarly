@@ -1,7 +1,12 @@
 package com.amarly
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -15,7 +20,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.amarly.data.TimerData.TimerData
+import com.amarly.data.TimerD
+import com.amarly.data.TimerD.TimerData
+import com.amarly.service.AlarmReceiver
 import com.amarly.ui.theme.AmarlyTheme
 import com.amarly.ui.timer.Timer
 import java.util.Calendar
@@ -27,13 +34,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             val timers = remember() {
                 mutableStateListOf<TimerData>(
                     TimerData(
-                        0,
-                        Calendar.getInstance(),
-                        0,
+                        triggerTime = Calendar.getInstance(),
+                        activeDays = TimerD.SUNDAY or TimerD.THURSDAY,
+                        message = "This is some random message I made",
                     )
                 )
             }
@@ -71,6 +77,47 @@ class MainActivity : ComponentActivity() {
                             onConfirm = { timerData ->
                                 timers.add(timerData)
                                 displayTimePicker = false
+                                val alarmIntent = Intent(this, AlarmReceiver::class.java).apply {
+                                    putExtra("timer_id", timerData.id)
+                                }
+
+                                val triggerMillis = timerData.triggerMillis()
+                                val alarmManager =
+                                    getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+                                val pendingIntent = PendingIntent.getBroadcast(
+                                    this,
+                                    timerData.id,
+                                    alarmIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                                )
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+
+                                    if (alarmManager.canScheduleExactAlarms()) {
+
+                                        alarmManager.setExactAndAllowWhileIdle(
+                                            AlarmManager.RTC_WAKEUP,
+                                            triggerMillis,
+                                            pendingIntent
+                                        )
+
+                                    } else {
+
+                                        val intent =
+                                            Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                                        startActivity(intent)
+
+                                    }
+
+                                } else {
+
+                                    alarmManager.setExactAndAllowWhileIdle(
+                                        AlarmManager.RTC_WAKEUP,
+                                        triggerMillis,
+                                        pendingIntent
+                                    )
+                                }
                             },
                             onDismiss = {
                                 displayTimePicker = false

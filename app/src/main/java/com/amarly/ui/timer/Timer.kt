@@ -60,12 +60,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.amarly.data.TimerData.TimerData
-import com.amarly.data.TimerData.TimerType
-import com.amarly.data.TimerData.days
-import com.amarly.data.TimerData.defaultVibePattern
+import com.amarly.data.TimerD.TimerData
+import com.amarly.data.TimerD.days
+import com.amarly.data.TimerD.defaultVibePattern
 import com.amarly.service.TimerService
 import com.amarly.ui.theme.GRAYISH_WHITE
+import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
 import com.example.amarly.R
 import java.util.Calendar
@@ -73,22 +73,57 @@ import kotlin.math.roundToInt
 
 object Timer {
 
+    // TODO: Temp
+    var i = 0;
+    fun formatAsTime(millis: Long): String {
+
+        val totalSeconds = millis / 1000
+        val totalMinutes = totalSeconds / 60
+        val totalHours = totalMinutes / 60
+        val days = totalHours / 24
+
+        val hours = totalHours % 24
+        val minutes = totalMinutes % 60
+        val seconds = totalSeconds % 60
+
+        return buildList {
+            if (days > 0) add("${days}d")
+            if (hours > 0) add("${hours}h")
+            if (minutes > 0) add("${minutes}m")
+            if (seconds > 0) add("${seconds}s")
+        }.joinToString(" ")
+    }
+
     @Composable
     fun TopBar(timers: List<TimerData>, modifier: Modifier = Modifier) {
-        // TODO:
+        val now = Calendar.getInstance()
+        val firstTriggeringTimer = timers
+            .filter { it.triggerMillis() - now.timeInMillis > 0 }
+            .map { it.triggerMillis() }
+            .minByOrNull { it }
         Text(
-            ""
+            text = if (firstTriggeringTimer != null) {
+                "Will be ringing in \n ${
+                    formatAsTime(firstTriggeringTimer - now.timeInMillis)
+                }"
+            } else {
+                "No upcoming alarms"
+            },
+            Modifier
+                .absolutePadding(10.dp, 30.dp, 10.dp, 10.dp),
+            style = Typography.headlineLarge,
+            color = GRAYISH_WHITE
         )
     }
 
     @Composable
-    fun TimerActiveDays(modifier: Modifier = Modifier, activeDays: Int, type: TimerType) {
+    fun TimerActiveDays(modifier: Modifier = Modifier, activeDays: Int) {
         Row(
             modifier,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             days.forEachIndexed { index, day ->
-                val enabled = (activeDays and (1 shl index)) != 0
+                val enabled = (activeDays and (1 shl (index + 1))) != 0
                 Text(
                     text = day,
                     modifier = Modifier,
@@ -100,7 +135,6 @@ object Timer {
                     style = MaterialTheme.typography.labelLarge
                 )
             }
-            // TODO: diff betn ONCE and REPEAT
         }
     }
 
@@ -121,16 +155,16 @@ object Timer {
         val unselectedColor = Color.Transparent
 
         fun toggleDay(index: Int) {
-            activeDays = activeDays xor (1 shl index)
+            activeDays = activeDays xor (1 shl (index + 1))
             onChange(activeDays)
         }
 
         fun setDay(index: Int, enabled: Boolean) {
             activeDays =
                 if (enabled) {
-                    activeDays or (1 shl index)
+                    activeDays or (1 shl (index + 1))
                 } else {
-                    activeDays and (1 shl index).inv()
+                    activeDays and (1 shl (index + 1)).inv()
                 }
 
             onChange(activeDays)
@@ -171,7 +205,7 @@ object Timer {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 days.forEachIndexed { index, day ->
-                    val selected = (activeDays and (1 shl index)) != 0
+                    val selected = (activeDays and (1 shl (index + 1))) != 0
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -246,26 +280,29 @@ object Timer {
 
     @Composable
     fun TimerMessage(modifier: Modifier = Modifier, text: String) {
-        // TODO:
         Text(
             text = text,
-            modifier = modifier
+            modifier = modifier.padding(10.dp, 2.dp)
         )
     }
 
     @Composable
     fun Timer(modifier: Modifier = Modifier, state: TimerData) {
         Card(modifier) {
-            TimerActiveDays(
-                Modifier.padding(10.dp),
-                state.activeDays,
-                state.type
-            )
+            if (state.activeDays > 0)
+                TimerActiveDays(
+                    Modifier.padding(10.dp, 5.dp),
+                    state.activeDays,
+                )
+            else
+                Row(Modifier.padding(5.dp)) {}
+
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .absolutePadding(10.dp, 0.dp, 10.dp, 10.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(10.dp, 0.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 TimerTime(triggerTime = state.triggerTime)
                 Switch(
@@ -275,9 +312,10 @@ object Timer {
                     },
                 )
             }
-            if (!state.message.isEmpty()) {
+            if (!state.message.isEmpty())
                 TimerMessage(Modifier, state.message)
-            }
+            else
+                Row(Modifier) {}
         }
     }
 
@@ -314,7 +352,10 @@ object Timer {
             ) {
 
                 Button(
-                    onClick = { onDelete(timer) },
+                    onClick = {
+                        onDelete(timer)
+                        offsetX = 0f
+                    },
                     modifier = Modifier
                         .fillMaxHeight()
                         .width(80.dp),
@@ -414,7 +455,7 @@ object Timer {
 
         var message = rememberTextFieldState("");
         var activeDays by remember {
-            mutableIntStateOf(1 shl (currTime.get(Calendar.DAY_OF_WEEK) - 1))
+            mutableIntStateOf(1 shl currTime.get(Calendar.DAY_OF_WEEK))
         }
         var ringtoneUri by remember {
             mutableStateOf(Uri.EMPTY)
@@ -527,16 +568,17 @@ object Timer {
                         val calendar = Calendar.getInstance().apply {
                             set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                             set(Calendar.MINUTE, timePickerState.minute)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
                         }
-
                         onConfirm(
                             TimerService.Register(
                                 TimerData(
                                     // TODO: id
+                                    ++i,
                                     message = message.text.toString(),
                                     activeDays = activeDays,
                                     triggerTime = calendar,
-                                    type = TimerType.ONCE,
                                     running = true,
                                     soundUri = ringtoneUri.toString(),
                                     vibration = vibrate.toTypedArray()
