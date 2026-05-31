@@ -8,11 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.amarly.data.AlarmRepository
 import com.example.amarly.R
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -26,18 +27,17 @@ class AlarmReceiver : BroadcastReceiver() {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onReceive(context: Context?, intent: Intent?) {
-        Log.i(
-            "AlarmDebug",
-            "Recieved"
-        )
-        if (context == null) return
+        if (context == null || intent == null) return
 
+        val alarmRepo = AlarmRepository(context)
+        val alarmId = intent.getStringExtra("alarm_id") ?: return
+        val alarm = alarmRepo.getById(alarmId) ?: return
         createNotificationChannel(context)
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.notification_sound_24px)
             .setContentTitle("Alarm")
-            .setContentText("Your timer is complete!")
+            .setContentText(alarm.message.ifEmpty { "Your timer is complete!" })
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
@@ -45,10 +45,16 @@ class AlarmReceiver : BroadcastReceiver() {
         NotificationManagerCompat.from(context)
             .notify(System.currentTimeMillis().toInt(), notification)
 
-        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-
+        val alarmSoundUri: Uri = if (alarm.soundUri.isNotEmpty()) {
+            Uri.parse(alarm.soundUri)
+        } else {
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+        }
         mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, alarmSound)
+            context.contentResolver.openAssetFileDescriptor(alarmSoundUri, "r")?.use {
+                setDataSource(it.fileDescriptor, it.startOffset, it.length)
+            }
+            isLooping = true 
             prepare()
             start()
         }

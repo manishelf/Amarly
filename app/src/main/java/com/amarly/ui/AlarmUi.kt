@@ -1,10 +1,11 @@
-package com.amarly.ui.timer
+package com.amarly.ui
 
 import android.app.Activity
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -41,6 +42,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -60,10 +62,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.amarly.data.TimerD.TimerData
-import com.amarly.data.TimerD.days
-import com.amarly.data.TimerD.defaultVibePattern
-import com.amarly.service.TimerService
+import com.amarly.data.AlarmData
 import com.amarly.ui.theme.GRAYISH_WHITE
 import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
@@ -71,13 +70,14 @@ import com.example.amarly.R
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-object Timer {
+object AlarmUi {
 
     // TODO: Temp
     var i = 0;
     fun formatAsTime(millis: Long): String {
 
         val totalSeconds = millis / 1000
+        Log.i("Amarly", totalSeconds.toString())
         val totalMinutes = totalSeconds / 60
         val totalHours = totalMinutes / 60
         val days = totalHours / 24
@@ -95,16 +95,19 @@ object Timer {
     }
 
     @Composable
-    fun TopBar(timers: List<TimerData>, modifier: Modifier = Modifier) {
+    fun TopBar(
+        Alarms: List<AlarmData>,
+        modifier: Modifier = Modifier
+    ) {
         val now = Calendar.getInstance()
-        val firstTriggeringTimer = timers
+        val firstTriggeringAlarm = Alarms
             .filter { it.triggerMillis() - now.timeInMillis > 0 }
             .map { it.triggerMillis() }
             .minByOrNull { it }
         Text(
-            text = if (firstTriggeringTimer != null) {
+            text = if (firstTriggeringAlarm != null) {
                 "Will be ringing in \n ${
-                    formatAsTime(firstTriggeringTimer - now.timeInMillis)
+                    formatAsTime(firstTriggeringAlarm - now.timeInMillis)
                 }"
             } else {
                 "No upcoming alarms"
@@ -117,13 +120,13 @@ object Timer {
     }
 
     @Composable
-    fun TimerActiveDays(modifier: Modifier = Modifier, activeDays: Int) {
+    fun AlarmActiveDays(modifier: Modifier = Modifier, activeDays: Int) {
         Row(
             modifier,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            days.forEachIndexed { index, day ->
-                val enabled = (activeDays and (1 shl (index + 1))) != 0
+            AlarmData.DAYS.forEachIndexed { index, day ->
+                val enabled = (activeDays and (1 shl index)) != 0
                 Text(
                     text = day,
                     modifier = Modifier,
@@ -132,20 +135,20 @@ object Timer {
                             WHITE
                         else
                             GRAYISH_WHITE,
-                    style = MaterialTheme.typography.labelLarge
+                    style = Typography.labelLarge
                 )
             }
         }
     }
 
     @Composable
-    fun TimerActiveDaysInput(
+    fun AlarmActiveDaysInput(
         modifier: Modifier = Modifier,
         currActiveDays: Int = 0,
         onChange: (Int) -> Unit
     ) {
         var activeDays by remember {
-            mutableStateOf(currActiveDays)
+            mutableIntStateOf(currActiveDays)
         }
         var rowWidth by remember {
             mutableFloatStateOf(0f)
@@ -155,16 +158,16 @@ object Timer {
         val unselectedColor = Color.Transparent
 
         fun toggleDay(index: Int) {
-            activeDays = activeDays xor (1 shl (index + 1))
+            activeDays = activeDays xor (1 shl index)
             onChange(activeDays)
         }
 
         fun setDay(index: Int, enabled: Boolean) {
             activeDays =
                 if (enabled) {
-                    activeDays or (1 shl (index + 1))
+                    activeDays or (1 shl index)
                 } else {
-                    activeDays and (1 shl (index + 1)).inv()
+                    activeDays and (1 shl index).inv()
                 }
 
             onChange(activeDays)
@@ -181,19 +184,19 @@ object Timer {
                     detectDragGestures(
                         onDragStart = { offset ->
 
-                            val itemWidth = rowWidth / days.size
+                            val itemWidth = rowWidth / AlarmData.DAYS.size
                             val index = (offset.x / itemWidth)
                                 .toInt()
-                                .coerceIn(0, days.lastIndex)
+                                .coerceIn(0, AlarmData.DAYS.lastIndex)
 
                             toggleDay(index)
                         },
                         onDrag = { change, _ ->
 
-                            val itemWidth = rowWidth / days.size
+                            val itemWidth = rowWidth / AlarmData.DAYS.size
                             val index = (change.position.x / itemWidth)
                                 .toInt()
-                                .coerceIn(0, days.lastIndex)
+                                .coerceIn(0, AlarmData.DAYS.lastIndex)
 
                             setDay(index, true)
                         }
@@ -204,8 +207,8 @@ object Timer {
                 modifier,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                days.forEachIndexed { index, day ->
-                    val selected = (activeDays and (1 shl (index + 1))) != 0
+                AlarmData.DAYS.forEachIndexed { index, day ->
+                    val selected = (activeDays and (1 shl index)) != 0
                     Box(
                         modifier = Modifier
                             .weight(1f)
@@ -220,7 +223,7 @@ object Timer {
                             .border(
                                 1.dp,
                                 Color.White,
-                                RoundedCornerShape(12.dp)
+                                androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
                             )
                             .clickable(true, onClick = {
                                 toggleDay(index)
@@ -242,7 +245,7 @@ object Timer {
     }
 
     @Composable
-    fun TimerTime(modifier: Modifier = Modifier, triggerTime: Calendar) {
+    fun AlarmTime(modifier: Modifier = Modifier, triggerTime: Calendar) {
         Row(
             modifier,
             verticalAlignment = Alignment.CenterVertically
@@ -279,7 +282,7 @@ object Timer {
     }
 
     @Composable
-    fun TimerMessage(modifier: Modifier = Modifier, text: String) {
+    fun AlarmMessage(modifier: Modifier = Modifier, text: String) {
         Text(
             text = text,
             modifier = modifier.padding(10.dp, 2.dp)
@@ -287,10 +290,10 @@ object Timer {
     }
 
     @Composable
-    fun Timer(modifier: Modifier = Modifier, state: TimerData) {
+    fun Alarm(modifier: Modifier = Modifier, state: AlarmData) {
         Card(modifier) {
             if (state.activeDays > 0)
-                TimerActiveDays(
+                AlarmActiveDays(
                     Modifier.padding(10.dp, 5.dp),
                     state.activeDays,
                 )
@@ -304,27 +307,28 @@ object Timer {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TimerTime(triggerTime = state.triggerTime)
+                AlarmTime(triggerTime = state.triggerTime)
                 Switch(
-                    checked = state.enabled,
+                    checked = state.running,
                     onCheckedChange = { newState ->
-                        state.enabled = newState
+                        state.running = newState
+                        // TODO: pause and enable
                     },
                 )
             }
             if (!state.message.isEmpty())
-                TimerMessage(Modifier, state.message)
+                AlarmMessage(Modifier, state.message)
             else
                 Row(Modifier) {}
         }
     }
 
     @Composable
-    fun TimerWithDelete(
-        timer: TimerData,
-        onDelete: (TimerData) -> Unit
+    fun AlarmWithDelete(
+        alarm: AlarmData,
+        onDelete: (AlarmData) -> Unit
     ) {
-        val shape = RoundedCornerShape(20.dp)
+        val shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
 
         var offsetX by remember {
             mutableFloatStateOf(0f)
@@ -353,7 +357,7 @@ object Timer {
 
                 Button(
                     onClick = {
-                        onDelete(timer)
+                        onDelete(alarm)
                         offsetX = 0f
                     },
                     modifier = Modifier
@@ -398,24 +402,24 @@ object Timer {
                         )
                     }
             ) {
-                Timer(
+                Alarm(
                     modifier = Modifier,
-                    state = timer
+                    state = alarm
                 )
             }
         }
     }
 
     @Composable
-    fun TimerList(
+    fun AlarmList(
         modifier: Modifier = Modifier,
-        timers: List<TimerData>,
-        deleteHandler: (item: TimerData) -> Unit
+        alarms: List<AlarmData>,
+        deleteHandler: (item: AlarmData) -> Unit
     ) {
         LazyColumn(modifier = modifier) {
-            items(timers) { timer ->
-                TimerWithDelete(
-                    timer = timer,
+            items(alarms.sortedBy { it.triggerMillis() }) { alarm ->
+                AlarmWithDelete(
+                    alarm = alarm,
                     onDelete = deleteHandler
                 )
             }
@@ -428,7 +432,7 @@ object Timer {
             modifier = Modifier.border(
                 width = 2.dp,
                 color = GRAYISH_WHITE,
-                shape = RoundedCornerShape(20.dp)
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
             ),
             onClick = onClick
         ) {
@@ -442,7 +446,7 @@ object Timer {
     @OptIn(ExperimentalMaterial3Api::class)
     fun TimePicker(
         modifier: Modifier = Modifier,
-        onConfirm: (TimerData) -> Unit = {},
+        onConfirm: (AlarmData) -> Unit = {},
         onDismiss: () -> Unit = {}
     ) {
         val currTime = Calendar.getInstance()
@@ -455,13 +459,13 @@ object Timer {
 
         var message = rememberTextFieldState("");
         var activeDays by remember {
-            mutableIntStateOf(1 shl currTime.get(Calendar.DAY_OF_WEEK))
+            mutableIntStateOf(1 shl (currTime.get(Calendar.DAY_OF_WEEK)-1))
         }
         var ringtoneUri by remember {
             mutableStateOf(Uri.EMPTY)
         }
         var vibrate = mutableListOf(0)
-        vibrate.addAll(defaultVibePattern)
+        vibrate.addAll(AlarmData.DEFAULT_VIB_PATTERN)
         val ringtonePickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -501,7 +505,7 @@ object Timer {
                     if (timePickerMode) {
                         androidx.compose.material3.TimePicker(state = timePickerState)
                     } else {
-                        androidx.compose.material3.TimeInput(state = timePickerState)
+                        TimeInput(state = timePickerState)
                     }
 
                     TextField(
@@ -511,7 +515,7 @@ object Timer {
                         placeholder = { Text("Title") },
                         modifier = Modifier.absolutePadding(0.dp, 0.dp, 0.dp, 10.dp)
                     )
-                    TimerActiveDaysInput(
+                    AlarmActiveDaysInput(
                         Modifier.absolutePadding(0.dp, 0.dp, 0.dp, 5.dp),
                         currActiveDays = activeDays,
                         onChange = { activeDaysIn ->
@@ -572,17 +576,15 @@ object Timer {
                             set(Calendar.MILLISECOND, 0)
                         }
                         onConfirm(
-                            TimerService.Register(
-                                TimerData(
-                                    // TODO: id
-                                    ++i,
-                                    message = message.text.toString(),
-                                    activeDays = activeDays,
-                                    triggerTime = calendar,
-                                    running = true,
-                                    soundUri = ringtoneUri.toString(),
-                                    vibration = vibrate.toTypedArray()
-                                )
+                            AlarmData(
+                                AlarmData.VERSION,
+                                message = message.text.toString(),
+                                activeDays = activeDays,
+                                triggerTime = calendar,
+                                timeZone = calendar.timeZone,
+                                running = true,
+                                soundUri = ringtoneUri.toString(),
+                                vibration = vibrate.toTypedArray()
                             )
                         )
 
