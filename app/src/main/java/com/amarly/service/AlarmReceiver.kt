@@ -23,7 +23,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object {
         var mediaPlayer: MediaPlayer? = null
-
+        var alarmId: String? = null
         const val CHANNEL_ID = "alarm_channel"
         const val CHANNEL_NAME = "Alarm Notifications"
     }
@@ -36,9 +36,9 @@ class AlarmReceiver : BroadcastReceiver() {
         val alarmRepo = AlarmRepository(context)
         val alarmId = intent.getStringExtra("alarm_id") ?: return
         val alarm = alarmRepo.getById(alarmId) ?: return
+        Companion.alarmId = alarmId
+
         createNotificationChannel(context)
-
-
         val fullScreenIntent = Intent(context, AlarmReceiverUi::class.java).apply{
             putExtra("timer_id", alarmId)
             flags =

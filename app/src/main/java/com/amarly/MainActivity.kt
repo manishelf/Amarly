@@ -34,7 +34,7 @@ import com.amarly.ui.theme.AmarlyTheme
 class MainActivity : ComponentActivity() {
     val alarmRepo = AlarmRepository(this)
     val alarmScheduler = AlarmScheduler(this)
-
+    val alarmMainUi = AlarmMainUi(this)
     val folderPicker =
         registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
 
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 registerForActivityResult(
                     ActivityResultContracts.RequestPermission()
-                ){}.launch(
+                ) {}.launch(
                     Manifest.permission.POST_NOTIFICATIONS
                 )
             }
@@ -81,13 +81,20 @@ class MainActivity : ComponentActivity() {
             NotificationManager::class.java
         )
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU
-            && !notificationManager.canUseFullScreenIntent()) {
+            && !notificationManager.canUseFullScreenIntent()
+        ) {
             val intent = Intent(
-                Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT).apply {
+                Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT
+            ).apply {
                 data = Uri.fromParts("package", packageName, null)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             startActivity(intent)
+        }
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+            this.startActivity(
+                Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            )
         }
         if(alarmRepo.getStorageFolder() == null){
             folderPicker.launch(null)
@@ -113,10 +120,10 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        AlarmMainUi.TopBar(alarms, Modifier)
+                        alarmMainUi.TopBar(alarms, Modifier)
                     },
                     floatingActionButton = {
-                        AlarmMainUi.AddButton(
+                        alarmMainUi.AddButton(
                             modifier = Modifier,
                             onClick = {
                                 displayTimePicker = true
@@ -124,7 +131,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
-                    AlarmMainUi.AlarmList(
+                    alarmMainUi.AlarmList(
                         Modifier.padding(
                             innerPadding
                         ),
@@ -137,16 +144,12 @@ class MainActivity : ComponentActivity() {
                     )
 
                     if (displayTimePicker) {
-                        AlarmMainUi.TimePicker(
+                        alarmMainUi.TimePicker(
                             Modifier,
                             onConfirm = { alarmData ->
                                 alarms.add(alarmData)
                                 alarmRepo.saveOne(alarmData)
-                                if(!alarmScheduler.register(alarmData)){
-                                    this.startActivity(
-                                        Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                    )
-                                }
+                                alarmScheduler.register(alarmData)
                                 displayTimePicker = false
                             },
                             onDismiss = {

@@ -1,6 +1,7 @@
 package com.amarly.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -66,17 +67,18 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.amarly.R
 import com.amarly.data.AlarmData
+import com.amarly.data.AlarmRepository
+import com.amarly.service.AlarmScheduler
 import com.amarly.ui.theme.GRAYISH_WHITE
 import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
 import kotlinx.coroutines.delay
 import java.util.Calendar
+import java.util.Locale
 import kotlin.math.roundToInt
 
-object AlarmMainUi {
+class AlarmMainUi(private val context: Context) {
 
-    // TODO: Temp
-    var i = 0;
     fun formatAsTime(millis: Long): String {
 
         val totalSeconds = millis / 1000
@@ -264,8 +266,8 @@ object AlarmMainUi {
             modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val hour = String.format("%02d", triggerTime.get(Calendar.HOUR))
-            val minute = String.format("%02d", triggerTime.get(Calendar.MINUTE))
+            val hour = String.format(Locale.getDefault(), "%02d", triggerTime.get(Calendar.HOUR))
+            val minute = String.format(Locale.getDefault(), "%02d", triggerTime.get(Calendar.MINUTE))
             Text(
                 text = hour,
                 Modifier,
@@ -326,7 +328,9 @@ object AlarmMainUi {
                     checked = state.running,
                     onCheckedChange = { newState ->
                         state.running = newState
-                        // TODO: pause and enable
+                        val alarmRepo = AlarmRepository(context)
+                        alarmRepo.saveOne(state)
+                        AlarmScheduler(context).registerAll(alarmRepo.loadAll())
                     },
                 )
             }

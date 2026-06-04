@@ -81,8 +81,10 @@ class AlarmScheduler (val context: Context){
     fun registerAll(timers: List<AlarmData>) : List<AlarmData> {
         val now = Calendar.getInstance()
         timers.forEach { it ->
-            if(it.triggerMillis() > now.timeInMillis) {
+            if(it.running && it.triggerMillis() > now.timeInMillis) {
                 register(it)
+            } else {
+                clear(it)
             }
         }
         return timers
