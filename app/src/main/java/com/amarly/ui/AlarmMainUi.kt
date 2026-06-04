@@ -45,9 +45,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,15 +64,16 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.amarly.R
 import com.amarly.data.AlarmData
 import com.amarly.ui.theme.GRAYISH_WHITE
 import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
-import com.example.amarly.R
+import kotlinx.coroutines.delay
 import java.util.Calendar
 import kotlin.math.roundToInt
 
-object AlarmUi {
+object AlarmMainUi {
 
     // TODO: Temp
     var i = 0;
@@ -96,18 +99,29 @@ object AlarmUi {
 
     @Composable
     fun TopBar(
-        Alarms: List<AlarmData>,
+        alarms: List<AlarmData>,
         modifier: Modifier = Modifier
     ) {
-        val now = Calendar.getInstance()
-        val firstTriggeringAlarm = Alarms
-            .filter { it.triggerMillis() - now.timeInMillis > 0 }
+        var currentTime by remember {
+            mutableLongStateOf(System.currentTimeMillis())
+        }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                delay(500)
+                currentTime = System.currentTimeMillis()
+            }
+        }
+
+        val firstTriggeringAlarm = alarms
             .map { it.triggerMillis() }
-            .minByOrNull { it }
+            .filter { it > currentTime }
+            .minOrNull()
+
         Text(
             text = if (firstTriggeringAlarm != null) {
                 "Will be ringing in \n ${
-                    formatAsTime(firstTriggeringAlarm - now.timeInMillis)
+                    formatAsTime(firstTriggeringAlarm - currentTime)
                 }"
             } else {
                 "No upcoming alarms"
@@ -416,8 +430,18 @@ object AlarmUi {
         alarms: List<AlarmData>,
         deleteHandler: (item: AlarmData) -> Unit
     ) {
+        val now = System.currentTimeMillis()
         LazyColumn(modifier = modifier) {
-            items(alarms.sortedBy { it.triggerMillis() }) { alarm ->
+            items(
+                alarms.sortedBy {
+                    val nextTrigger = it.triggerMillis()
+                    if (nextTrigger >= now) {
+                        nextTrigger - now
+                    } else {
+                        Long.MAX_VALUE
+                    }
+                }
+            ) { alarm ->
                 AlarmWithDelete(
                     alarm = alarm,
                     onDelete = deleteHandler

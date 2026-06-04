@@ -1,20 +1,23 @@
 package com.amarly.service
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import com.amarly.data.AlarmRepository
-import com.example.amarly.R
+import com.amarly.ui.AlarmReceiverUi
 
 class AlarmReceiver : BroadcastReceiver() {
 
@@ -25,6 +28,7 @@ class AlarmReceiver : BroadcastReceiver() {
         const val CHANNEL_NAME = "Alarm Notifications"
     }
 
+    @SuppressLint("FullScreenIntentPolicy")
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
@@ -34,49 +38,67 @@ class AlarmReceiver : BroadcastReceiver() {
         val alarm = alarmRepo.getById(alarmId) ?: return
         createNotificationChannel(context)
 
+
+        val fullScreenIntent = Intent(context, AlarmReceiverUi::class.java).apply{
+            putExtra("timer_id", alarmId)
+            flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+
+        val fullScreenPendingIntent = PendingIntent.getActivity(
+            context,
+            alarmId.hashCode(),
+            fullScreenIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        // technically not recommended but required to get the full screen intent launched
+        context.startActivity(fullScreenIntent)
+
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.notification_sound_24px)
+            .setSmallIcon(com.amarly.R.drawable.notification_sound_24px)
             .setContentTitle("Alarm")
-            .setContentText(alarm.message.ifEmpty { "Your timer is complete!" })
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
+            .setContentText("Amarly: " + alarm.message.ifEmpty { "Your timer is complete!" })
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setFullScreenIntent(fullScreenPendingIntent, true)
+            .setOngoing(true)
             .build()
 
         NotificationManagerCompat.from(context)
-            .notify(System.currentTimeMillis().toInt(), notification)
+            .notify(alarmId.hashCode(), notification)
 
         val alarmSoundUri: Uri = if (alarm.soundUri.isNotEmpty()) {
-            Uri.parse(alarm.soundUri)
+            alarm.soundUri.toUri()
         } else {
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         }
+
         mediaPlayer = MediaPlayer().apply {
-            context.contentResolver.openAssetFileDescriptor(alarmSoundUri, "r")?.use {
-                setDataSource(it.fileDescriptor, it.startOffset, it.length)
-            }
-            isLooping = true 
+            setDataSource(context, alarmSoundUri)
+            isLooping = true
             prepare()
             start()
         }
     }
 
     private fun createNotificationChannel(context: Context) {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Notifications for alarms"
-            }
-
-            val manager = context.getSystemService(
-                NotificationManager::class.java
-            )
-
-            manager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Notifications for alarms"
+            setBypassDnd(true)
+            lockscreenVisibility = Notification.VISIBILITY_PUBLIC
         }
+
+        val manager = context.getSystemService(
+            NotificationManager::class.java
+        )
+
+        manager.createNotificationChannel(channel)
     }
 }

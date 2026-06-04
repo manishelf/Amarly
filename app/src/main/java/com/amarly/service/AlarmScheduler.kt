@@ -4,14 +4,22 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Build
 import android.provider.Settings
 import com.amarly.data.AlarmData
 
 class AlarmScheduler (val context: Context){
     fun register(timer: AlarmData): Boolean {
+
+        if(timer.triggerMillis() < Calendar.getInstance().timeInMillis) return false
+
         val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra("alarm_id", timer.id())
+            flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
         val triggerMillis = timer.triggerMillis()
@@ -23,6 +31,8 @@ class AlarmScheduler (val context: Context){
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
+
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {
                 alarmManager.setExactAndAllowWhileIdle(
@@ -30,10 +40,12 @@ class AlarmScheduler (val context: Context){
                     triggerMillis,
                     pendingIntent
                 )
+
             } else {
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)            }
+                context.startActivity(intent)
+            }
         } else {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
@@ -67,8 +79,11 @@ class AlarmScheduler (val context: Context){
     }
 
     fun registerAll(timers: List<AlarmData>) : List<AlarmData> {
+        val now = Calendar.getInstance()
         timers.forEach { it ->
-            register( it)
+            if(it.triggerMillis() > now.timeInMillis) {
+                register(it)
+            }
         }
         return timers
     }

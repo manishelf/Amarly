@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.amarly"
+    namespace = "com.amarly"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,8 +12,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.amarly"
-        minSdk = 26
+        applicationId = "com.amarly"
+        minSdk = 27
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
