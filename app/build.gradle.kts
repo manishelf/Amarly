@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.amarly"
+    namespace = "com.amarly"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,8 +12,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.amarly"
-        minSdk = 23
+        applicationId = "com.amarly"
+        minSdk = 27
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -47,7 +47,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.documentfile)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.ui)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -55,4 +58,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    //
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.20.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.20.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 }
