@@ -10,7 +10,7 @@ class AlarmData(
     var activeDays: Int = 0,
     var running: Boolean = false,
     var soundUri: String = "default",
-    var vibration: Array<Int> = DEFAULT_VIB_PATTERN,
+    var vibration: LongArray = DEFAULT_VIB_PATTERN,
     var maxSnooze: Int = 5,
     var puzzleType: PuzzleType = PuzzleType.SNOOZE_DISMISS,
     var message: String = ""
@@ -27,7 +27,7 @@ class AlarmData(
         val FRIDAY = 1 shl 5
         val SATURDAY = 1 shl 6
 
-        val DEFAULT_VIB_PATTERN = arrayOf(0, 500, 500)
+        val DEFAULT_VIB_PATTERN = longArrayOf(0, 500, 500)
 
         val DAYS = listOf("S", "M", "T", "W", "T", "F", "S")
     }
@@ -65,27 +65,26 @@ class AlarmData(
 
     fun triggerInstant(): Instant {
         val now = ZonedDateTime.now()
-        val nextTrigger = triggerTime
+        var nextTrigger = triggerTime
         // Non-repeating alarm
         if (activeDays == DAY_NONE) {
             // If already passed today -> tomorrow
             if (nextTrigger.isBefore(now)) {
-                nextTrigger.plusDays(1)
+                nextTrigger = nextTrigger.plusDays(1)
             }
-            return nextTrigger.toInstant()
         }
         // Repeating alarm
         for (i in 0..6) {
-            val candidate = triggerTime
-            candidate.plusDays(i + 0L)
+            val candidate = triggerTime.plusDays(i.toLong())
             val checkDay = 1 shl (candidate.dayOfWeek.value - 1)
 
             if ((activeDays and checkDay) != 0) {
-                // Today but already passed
-                if (candidate.isBefore(now) && activeDays > 0 && running) {
-                    return candidate.plusDays(7).toInstant()
+                if (candidate.isAfter(now)) {
+                    nextTrigger = candidate
+                    break
+                } else {
+                    nextTrigger = candidate.plusDays(7)
                 }
-                return candidate.toInstant()
             }
         }
         return nextTrigger.toInstant()

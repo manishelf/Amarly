@@ -72,8 +72,12 @@ fun TimePickerDialogue(
     var ringtoneUri by remember {
         mutableStateOf(Uri.EMPTY)
     }
-    var vibrate = mutableListOf(0)
-    vibrate.addAll(AlarmData.DEFAULT_VIB_PATTERN)
+
+    // TODO: custom vibration patterns
+    var vibrate by remember {
+        mutableStateOf(AlarmData.DEFAULT_VIB_PATTERN)
+    }
+
     val ringtonePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -193,7 +197,7 @@ fun TimePickerDialogue(
                             triggerTime = triggerTime,
                             running = true,
                             soundUri = ringtoneUri.toString(),
-                            vibration = vibrate.toTypedArray()
+                            vibration = vibrate
                         )
                     )
 

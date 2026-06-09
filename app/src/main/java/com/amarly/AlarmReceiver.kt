@@ -8,13 +8,9 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
-import android.media.RingtoneManager
-import android.net.Uri
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.net.toUri
 import com.amarly.ui.reciever.AlarmReceiverUi
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -24,7 +20,6 @@ class AlarmReceiver : BroadcastReceiver() {
         var alarmSound: String = ""
         val NOTIFICATION_CHANNEL_ID = "Amarly_alarm"
         val NOTIFICATION_CHANNEL_NAME = "Amarly Alarm Notifications"
-        var mediaPlayer: MediaPlayer? = null
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
@@ -34,6 +29,7 @@ class AlarmReceiver : BroadcastReceiver() {
         alarmId = intent.getStringExtra("alarm_id") ?: return
         alarmMessage = intent.getStringExtra("alarm_message") ?: ""
         alarmSound = intent.getStringExtra("alarm_sound") ?: ""
+        val pattern = longArrayOf(0, 500, 500)
 
         createNotificationChannel(context)
         val fullScreenIntent = Intent(context, AlarmReceiverUi::class.java).apply {
@@ -66,19 +62,6 @@ class AlarmReceiver : BroadcastReceiver() {
 
         NotificationManagerCompat.from(context)
             .notify(alarmId.hashCode(), notification)
-
-        val alarmSoundUri: Uri = if (alarmSound.isNotEmpty()) {
-            alarmSound.toUri()
-        } else {
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-        }
-
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(context, alarmSoundUri)
-            isLooping = true
-            prepare()
-            start()
-        }
     }
 
     private fun createNotificationChannel(context: Context) {

@@ -14,7 +14,6 @@ import com.amarly.repo.FileRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.Instant
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val repo = FileRepo(app)
@@ -84,8 +83,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun nextAlarmMillis(): Long {
         return alarms
+            .filter { it.running }
             .map { it.triggerInstant() }
-            .filter { it.isAfter(Instant.now()) }
             .minOrNull()?.toEpochMilli() ?: -1
     }
 
