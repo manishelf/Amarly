@@ -40,6 +40,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) {
             val loaded = scheduler.registerAll(repo.getAllAlarms())
             withContext(Dispatchers.Main) {
+                alarms.clear()
                 alarms.addAll(loaded)
                 isLoaded = true
             }
@@ -55,18 +56,42 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun toggleAlarm(alarm: AlarmData) {
-        alarm.running = !alarm.running
-        updateAlarm(alarm)
+        updateAlarm(alarm.copy(running = !alarm.running))
     }
 
     fun deleteAlarm(alarm: AlarmData) {
         alarms.remove(alarm)
-        scheduler.clear(alarm)
-        repo.deleteOneAlarm(alarm)
+        viewModelScope.launch {
+            scheduler.clear(alarm)
+            repo.deleteOneAlarm(alarm)
+        }
     }
 
-    fun updateAlarm(alarm: AlarmData): AlarmData {
-        TODO("")
+    // ID is not changed
+    fun updateAlarm(alarm: AlarmData) {
+        val index = alarms.indexOfFirst { it.id() == alarm.id() }
+        if (index != -1) {
+            alarms[index] = alarm
+        }
+        viewModelScope.launch {
+            repo.saveOne(alarm)
+            scheduler.clear(alarm)
+            if (alarm.running) {
+                scheduler.register(alarm)
+            }
+        }
+    }
+
+    // ID is updated
+    fun updateAlarm(alarmOld: AlarmData, alarmNew: AlarmData) {
+        viewModelScope.launch {
+            repo.deleteOneAlarm(alarmOld)
+            repo.saveOne(alarmNew)
+            val index = alarms.indexOf(alarmOld)
+            if (index != -1) {
+                alarms[index] = alarmNew
+            }
+        }
     }
 
     fun duplicateAlarm(alarm: AlarmData): AlarmData {
@@ -79,13 +104,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setRootFolder(uri: Uri) {
         repo.setRootFolder(uri)
-    }
-
-    fun nextAlarmMillis(): Long {
-        return alarms
-            .filter { it.running }
-            .map { it.triggerInstant() }
-            .minOrNull()?.toEpochMilli() ?: -1
     }
 
 }

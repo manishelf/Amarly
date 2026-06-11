@@ -17,8 +17,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.amarly.AlarmReceiver
-import com.amarly.AlarmReceiver.Companion.alarmSound
 import com.amarly.data.AlarmData
 import com.amarly.repo.AlarmScheduler
 import com.amarly.repo.FileRepo
@@ -29,15 +27,19 @@ import kotlinx.coroutines.launch
 
 class RecieverViewModel(app: Application) : AndroidViewModel(app) {
 
-    companion object {
-        val SNOOZE_TIME_MIN = 5
-    }
+    val SNOOZE_TIME_IN_MIN = 5
+    val INTERACTION_TIME_IN_MIN = 1
 
     val maxSnoozeCount: Int
         get() {
-            return alarm?.maxSnooze ?: 5
+            return alarm.maxSnooze
         }
-    var currPuzzle by mutableStateOf(PuzzleType.SNOOZE_DISMISS)
+
+    var interactionCountStart by mutableStateOf(System.currentTimeMillis())
+    var interactionCountdownProgress by mutableStateOf(1f)
+        private set
+
+    var currPuzzle by mutableStateOf(PuzzleType.SIMPLE_DISMISS)
 
     var snoozeJob by mutableStateOf<Job?>(null)
 
@@ -45,14 +47,24 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
     private val scheduler = AlarmScheduler(app)
     var mediaPlayer: MediaPlayer? = null
     var vibrator: Vibrator? = null
+    var playingSound: Boolean = false
+    var playingVibration: Boolean = false
 
-    private var alarm: AlarmData? = null
+    private lateinit var alarm: AlarmData;
 
     fun init(activity: Activity, alarmId: String) {
-        alarm = repo.getById(alarmId)
 
-        val alarmSoundUri: Uri = if (alarmSound.isNotEmpty()) {
-            alarmSound.toUri()
+        alarm = repo.getById(alarmId) ?: alarm
+        if (alarm.activeDays == AlarmData.DAY_NONE) {
+            alarm.running = false
+            viewModelScope.launch {
+                repo.saveOne(alarm)
+                scheduler.registerAll(repo.getAllAlarms())
+            }
+        }
+
+        val alarmSoundUri: Uri = if (alarm.soundUri.isNotEmpty()) {
+            alarm.soundUri.toUri()
         } else {
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         }
@@ -61,7 +73,6 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
             setDataSource(activity, alarmSoundUri)
             isLooping = true
             prepare()
-            start()
         }
 
         vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -71,56 +82,61 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
         } else {
             activity.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator?.vibrate(
-                VibrationEffect.createWaveform(alarm?.vibration, 0)
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            vibrator?.vibrate(alarm?.vibration, 0)
-        }
+
+        startPlayback()
     }
 
-    val alarmMessage: String?
+    val alarmMessage: String
         get() {
-            return alarm?.message
+            return alarm.message
         }
 
     fun dissmiss(activity: Activity, dismissTime: Long): Boolean {
-        if (alarm?.puzzleType == PuzzleType.SNOOZE_DISMISS) {
-            mediaPlayer?.stop()
-            vibrator?.cancel()
+        if (alarm.puzzleType == PuzzleType.SIMPLE_DISMISS || currPuzzle == alarm.puzzleType) {
+            stopPlayback()
             NotificationManagerCompat.from(getApplication())
-                .cancel(AlarmReceiver.alarmId.hashCode())
+                .cancel(alarm.id().hashCode())
             activity.finish()
-
         } else {
-            currPuzzle = alarm!!.puzzleType
+            currPuzzle = alarm.puzzleType
         }
         snoozeJob?.cancel()
         return false
     }
 
-    fun snooze(snoozeCount: Int): Boolean {
-        // TODO: the snooze button should be dismissed during a snooze
-        if (snoozeCount > alarm?.maxSnooze ?: 5) {
+    fun stopPlayback() {
+        mediaPlayer?.pause() // TODO: should it be stop() here? is it a leak otherwise?
+        vibrator?.cancel()
+        playingSound = false
+        playingVibration = false
+    }
+
+    fun startPlayback() {
+        mediaPlayer?.start()
+        vibrator?.vibrate(
+            VibrationEffect.createWaveform(alarm.vibration, 0)
+        )
+        playingSound = true
+        playingVibration = true
+    }
+
+    fun snooze(snoozeCount: Int, snoozeTimeInMin: Int = SNOOZE_TIME_IN_MIN): Boolean {
+        if (snoozeCount > (alarm.maxSnooze)) {
             return false
         } else {
-            mediaPlayer?.pause()
-            vibrator?.cancel()
+            interactionCountdownProgress = 1f
+            interactionCountStart = System.currentTimeMillis()
+            stopPlayback()
 
             snoozeJob?.cancel()
             snoozeJob = viewModelScope.launch {
-                delay(SNOOZE_TIME_MIN * 60 * 1000L)
-                mediaPlayer?.start()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator?.vibrate(
-                        VibrationEffect.createWaveform(alarm?.vibration, 0)
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    vibrator?.vibrate(alarm?.vibration, 0)
+                while (interactionCountdownProgress > 0) {
+                    val elapsed = System.currentTimeMillis() - interactionCountStart
+                    val p = 1f - (elapsed / (snoozeTimeInMin * 60 * 1000).toFloat())
+                    interactionCountdownProgress = p.coerceIn(0f, 1f)
+                    delay(16)
                 }
+                startPlayback()
             }
         }
         return true

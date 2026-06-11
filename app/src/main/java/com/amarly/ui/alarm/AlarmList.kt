@@ -33,8 +33,8 @@ fun AlarmList(
                 )
             else
                 AlarmItem(
-                    alarm,
-                    onToggle
+                    alarm = alarm,
+                    onToggle = onToggle
                 )
         }
     }

@@ -1,6 +1,7 @@
 package com.amarly
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -15,21 +16,17 @@ import com.amarly.ui.reciever.AlarmReceiverUi
 
 class AlarmReceiver : BroadcastReceiver() {
     companion object {
-        var alarmId: String? = null
-        var alarmMessage: String = ""
-        var alarmSound: String = ""
         val NOTIFICATION_CHANNEL_ID = "Amarly_alarm"
         val NOTIFICATION_CHANNEL_NAME = "Amarly Alarm Notifications"
     }
 
+
+    @SuppressLint("FullScreenIntentPolicy")
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null || intent == null) return
-
-        alarmId = intent.getStringExtra("alarm_id") ?: return
-        alarmMessage = intent.getStringExtra("alarm_message") ?: ""
-        alarmSound = intent.getStringExtra("alarm_sound") ?: ""
-        val pattern = longArrayOf(0, 500, 500)
+        val alarmId = intent.getStringExtra("alarm_id") ?: return
+        val alarmMessage = intent.getStringExtra("alarm_message") ?: ""
 
         createNotificationChannel(context)
         val fullScreenIntent = Intent(context, AlarmReceiverUi::class.java).apply {

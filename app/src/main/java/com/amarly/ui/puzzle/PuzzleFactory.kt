@@ -1,35 +1,146 @@
 package com.amarly.ui.puzzle
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.amarly.ui.theme.Typography
 
 
 enum class PuzzleType {
-    SNOOZE_DISMISS,
+    SIMPLE_DISMISS,
+
+    // TODO: full expression tree
+    MATH_EASY,
+    MATH_HARD,
+    MATH_ADVANANCE,
+
+    // TODO:
+    TYPING,
+    TRIVIA,
+    SCAN,
+    QNA
 }
 
-class PuzzleFactory {
-
+interface PuzzleComp {
     @Composable
-    fun Puzzle(
-        type: PuzzleType,
-        maxSnoozeCount: Int = 5,
+    fun Comp(
         onSnooze: (Int) -> Boolean,
-        onDissmiss: (Long) -> Boolean,
-        modifier: Modifier = Modifier
-    ) {
-        when (type) {
-            PuzzleType.SNOOZE_DISMISS -> {
-                SnoozeDissmiss(
-                    onSnooze = onSnooze,
-                    onDissmiss = onDissmiss,
-                    modifier = Modifier,
-                )
-            }
+        onDismiss: () -> Boolean,
+        onInteraction: () -> Unit,
+        modifier: Modifier = Modifier,
+        questionNumber: Int = 0,
+    )
+}
 
-            else -> {
-                Text("Unknown puzzle type")
+@Composable
+fun Puzzle(
+    type: PuzzleType,
+    maxSnoozeCount: Int = 5,
+    onSnooze: (Int) -> Boolean,
+    onDismiss: (Long) -> Boolean,
+    onInteraction: () -> Unit,
+    totalQuestions: Int = 3,
+    modifier: Modifier = Modifier
+) {
+
+    var questionNo by remember {
+        mutableStateOf(1)
+    }
+
+    val startTime = rememberSaveable { System.currentTimeMillis() }
+
+    val onDismissHandler = {
+        if (questionNo < totalQuestions && type != PuzzleType.SIMPLE_DISMISS) {
+            questionNo += 1
+            false
+        } else {
+            onDismiss(System.currentTimeMillis() - startTime)
+            true
+        }
+    }
+
+    Card(modifier) {
+
+        // include question no simply for re-rendering
+        if (type != PuzzleType.SIMPLE_DISMISS && questionNo > 0) {
+            Text(
+                text = "Q $questionNo/$totalQuestions",
+                modifier = Modifier
+                    .absolutePadding(50.dp, 100.dp, 50.dp, 20.dp),
+                textAlign = TextAlign.Justify,
+                style = Typography.displayMedium
+            )
+        }
+
+        AnimatedContent(
+            targetState = questionNo,
+            transitionSpec = {
+                // this is some vodo syntax
+                (slideInHorizontally { it } + fadeIn()) togetherWith
+                        (slideOutHorizontally { -it } + fadeOut())
+            },
+            label = "PuzzleSlide"
+        ) { it ->
+            val ignore = it
+
+            // TODO: this should be a registry with auto discovery or something
+            when (type) {
+                PuzzleType.SIMPLE_DISMISS -> {
+                    SnoozeDissmiss().Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                    )
+                }
+
+                PuzzleType.MATH_EASY -> {
+                    Math(1).Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNo = questionNo
+                    )
+                }
+
+                PuzzleType.MATH_HARD -> {
+                    Math(2).Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNo = questionNo
+                    )
+                }
+
+                PuzzleType.MATH_ADVANANCE -> {
+                    Math(3).Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                    )
+                }
+
+                else -> {
+                    Text("Unknown puzzle type")
+                }
             }
         }
     }

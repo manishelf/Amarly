@@ -12,23 +12,23 @@ import java.time.Instant
 
 
 class AlarmScheduler(val context: Context) {
-    fun register(timer: AlarmData): Boolean {
+    fun register(alarm: AlarmData): Boolean {
 
-        if (timer.triggerInstant().isBefore(Instant.now())) return false
+        if (alarm.triggerInstant().isBefore(Instant.now())) return false
 
         val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("alarm_id", timer.id())
+            putExtra("alarm_id", alarm.id())
             flags =
                 Intent.FLAG_ACTIVITY_NEW_TASK or
                         Intent.FLAG_ACTIVITY_CLEAR_TOP or
                         Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
 
-        val triggerMillis = timer.triggerInstant().toEpochMilli()
+        val triggerMillis = alarm.triggerInstant().toEpochMilli()
         val alarmManager = context.getSystemService(AlarmManager::class.java) ?: return false
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            timer.hashCode(),
+            alarm.hashCode(),
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )

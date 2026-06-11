@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -18,6 +22,9 @@ fun AlarmItem(
     onToggle: (AlarmData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var running by remember {
+        mutableStateOf(alarm.running)
+    }
     Card(modifier) {
         if (alarm.activeDays > 0)
             AlarmActiveDays(
@@ -36,9 +43,9 @@ fun AlarmItem(
         ) {
             AlarmTime(triggerTime = alarm.triggerTime)
             Switch(
-                checked = alarm.running,
+                checked = running,
                 onCheckedChange = { newState ->
-                    alarm.running = newState
+                    running = newState
                     onToggle(alarm)
                 },
             )

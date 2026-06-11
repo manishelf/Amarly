@@ -1,8 +1,13 @@
 package com.amarly
 
+import android.Manifest
+import android.app.NotificationManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,8 +17,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.amarly.ui.alarm.AlarmList
 import com.amarly.ui.main.ActionButton
 import com.amarly.ui.main.BottomBar
@@ -23,6 +32,7 @@ import com.amarly.ui.main.TimePickerDialogue
 import com.amarly.ui.main.TimePickerType
 import com.amarly.ui.main.TopBar
 import com.amarly.ui.theme.AmarlyTheme
+import java.time.Instant
 
 class MainActivity : ComponentActivity() {
     // what does by mean here?
@@ -49,15 +59,35 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        checkPermissions()
+        /*
+        viewModel.addAlarm(
+            AlarmData(
+                1,
+                ZonedDateTime.now().plusSeconds(10),
+                puzzleType = PuzzleType.MATH_EASY,
+                message = "Some sample text to test out the things"
+            )
+        )
+         */
+
         setContent {
-            LaunchedEffect({}) {
-                if (viewModel.getRootFolder() == null) rootFolderPicker.launch(null)
-            }
             AmarlyTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        TopBar(viewModel.nextAlarmMillis(), Modifier)
+                        // TODO: this does not stop on toggle of alarm
+                        val nextAlarmMillis by remember {
+                            derivedStateOf {
+                                val now = Instant.now()
+                                viewModel.alarms
+                                    .filter { it.running }
+                                    .map { it.triggerInstant() }
+                                    .filter { it.isAfter(now) }
+                                    .minOrNull()?.toEpochMilli() ?: -1
+                            }
+                        }
+                        TopBar(nextAlarmMillis, Modifier)
                     },
                     bottomBar = {
                         BottomBar()
@@ -104,6 +134,49 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    fun checkPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                registerForActivityResult(
+                    ActivityResultContracts.RequestPermission()
+                ) {}.launch(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            }
+        }
+        if (!Settings.canDrawOverlays(this)) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                "package:$packageName".toUri()
+            )
+
+            startActivity(intent)
+        }
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU
+            && !notificationManager.canUseFullScreenIntent()
+        ) {
+            val intent = Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT)
+                .apply {
+                    data = Uri.fromParts("package", packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            startActivity(intent)
+        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            startActivity(intent)
+        }
+        if (viewModel.getRootFolder() == null) {
+            rootFolderPicker.launch(null)
         }
     }
 }

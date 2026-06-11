@@ -4,7 +4,7 @@ import com.amarly.ui.puzzle.PuzzleType
 import java.time.Instant
 import java.time.ZonedDateTime
 
-class AlarmData(
+data class AlarmData(
     val version: Int = VERSION,
     val triggerTime: ZonedDateTime,
     var activeDays: Int = 0,
@@ -12,7 +12,7 @@ class AlarmData(
     var soundUri: String = "default",
     var vibration: LongArray = DEFAULT_VIB_PATTERN,
     var maxSnooze: Int = 5,
-    var puzzleType: PuzzleType = PuzzleType.SNOOZE_DISMISS,
+    var puzzleType: PuzzleType = PuzzleType.SIMPLE_DISMISS,
     var message: String = ""
 ) {
 
