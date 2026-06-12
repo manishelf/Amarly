@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ import com.amarly.ui.theme.Typography
 class SnoozeDissmiss : PuzzleComp {
     @Composable
     override fun Comp(
-        onSnooze: (Int) -> Boolean,
+        onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
         modifier: Modifier,
@@ -55,15 +56,29 @@ class SnoozeDissmiss : PuzzleComp {
                         style = Typography.displayMedium
                     )
                 }
+                if (snoozeCount > 0) {
+                    AssistChip(
+                        onClick = {},
+                        enabled = false,
+                        label = {
+                            Text(
+                                text = "Snoozed $snoozeCount times already",
+                                style = Typography.titleLarge
+                            )
+                        }
+                    )
+                }
                 Button(
                     enabled = snoozeEnabled,
                     onClick = {
-                        snoozeEnabled = onSnooze(++snoozeCount)
+                        snoozeEnabled = false
+                        onSnooze(++snoozeCount, {
+                            snoozeEnabled = true
+                        })
                     }
                 ) {
                     Text(
-                        if (snoozeCount > 0) String.format("Snoozed \n%d", snoozeCount)
-                        else "Snooze",
+                        text = "Snooze",
                         style = Typography.displayMedium,
                         textAlign = TextAlign.Center
                     )

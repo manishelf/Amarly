@@ -1,9 +1,11 @@
-package com.amarly.ui.reciever
+package com.amarly.ui.receiver
 
 import android.app.KeyguardManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -27,8 +29,19 @@ class AlarmReceiverUi : ComponentActivity() {
     override fun onCreate(savedInstantState: Bundle?) {
         super.onCreate(savedInstantState)
 
+        // Lock screen keyguard
+        // TODO: this requires additional permission from settings for display on lock screen
         val km = getSystemService(KeyguardManager::class.java)
         km?.requestDismissKeyguard(this, null)
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // Ignore back button
+                }
+            }
+        )
 
         viewModel.init(this, intent.getStringExtra("alarm_id") ?: return)
 
@@ -49,8 +62,8 @@ class AlarmReceiverUi : ComponentActivity() {
                             if (!viewModel.alarmMessage.isEmpty())
                                 Text(
                                     text = viewModel.alarmMessage,
-                                    Modifier.padding(10.dp, 30.dp, 10.dp, 0.dp),
-                                    style = Typography.displayLarge
+                                    Modifier.padding(15.dp, 50.dp, 15.dp, 15.dp),
+                                    style = Typography.headlineLarge
                                 )
                         }
                     }
@@ -62,20 +75,23 @@ class AlarmReceiverUi : ComponentActivity() {
                         contentAlignment = Alignment.Center
                     ) {
                         CountDownTimerCard(
-                            perogress = viewModel.interactionCountdownProgress
+                            progress = viewModel.interactionCountdownProgress
                         ) {
                             Puzzle(
                                 type = viewModel.currPuzzle,
-                                maxSnoozeCount = viewModel.maxSnoozeCount,
+                                totalQuestions = viewModel.puzzleQuestionCount,
                                 onDismiss = {
-                                    viewModel.dissmiss(
+                                    viewModel.dismiss(
                                         activity = this@AlarmReceiverUi,
-                                        dismissTime = it
                                     )
                                 },
                                 onSnooze = viewModel::snooze,
                                 onInteraction = {
-                                    viewModel.snooze(1, viewModel.INTERACTION_TIME_IN_MIN)
+                                    viewModel.snooze(
+                                        snoozeCount = 1,
+                                        onComplete = {},
+                                        snoozeTimeInMin = viewModel.INTERACTION_TIME_IN_MIN
+                                    )
                                 },
                                 modifier = Modifier
                             )
@@ -83,6 +99,21 @@ class AlarmReceiverUi : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        if (!viewModel.isDismissed) {
+            startActivity(
+                Intent(this, AlarmReceiverUi::class.java).apply {
+                    addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                                Intent.FLAG_ACTIVITY_SINGLE_TOP
+                    )
+                }
+            )
         }
     }
 }

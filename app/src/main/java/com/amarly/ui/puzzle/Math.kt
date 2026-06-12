@@ -1,6 +1,7 @@
 package com.amarly.ui.puzzle
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,7 +89,7 @@ class Expression(
         return result
     }
 
-    fun toStringPollish(): String {
+    fun toStringPolish(): String {
         val sb = StringBuilder();
         for (i in operators) {
             sb.append(i.symbol)
@@ -166,7 +167,7 @@ class Math(
 
     @Composable
     override fun Comp(
-        onSnooze: (Int) -> Boolean,
+        onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
         modifier: Modifier,
@@ -180,6 +181,13 @@ class Math(
         var answerText by remember {
             mutableStateOf("")
         }
+
+        val showAnswerWhenDespirate = true
+        val equalsClickUntil = 10
+        var equalsClickCounter by remember {
+            mutableStateOf(0)
+        }
+
         Card(
             Modifier.fillMaxSize()
         ) {
@@ -191,7 +199,7 @@ class Math(
                 Question(
                     text = when (difficulty) {
                         1, 2 -> currQuestion.toStringInfix()
-                        3, 4 -> currQuestion.toStringPollish()
+                        3, 4 -> currQuestion.toStringPolish()
                         else -> currQuestion.toStringReversePollish()
                     }
                 )
@@ -206,6 +214,15 @@ class Math(
                             onDismiss()
                         }
                         onInteraction()
+                    },
+                    onEqualsClick = {
+                        equalsClickCounter++
+                        if (equalsClickCounter > equalsClickUntil) {
+                            equalsClickCounter = 0
+                            if (showAnswerWhenDespirate) {
+                                answerText = result.toString()
+                            }
+                        }
                     }
                 )
             }
@@ -232,6 +249,7 @@ class Math(
         value: String,
         readOnly: Boolean = false,
         onValueChange: (String) -> Unit,
+        onEqualsClick: () -> Unit,
         modifier: Modifier = Modifier
     ) {
         val size = 50.dp
@@ -246,7 +264,8 @@ class Math(
                 Surface(
                     modifier = Modifier
                         .padding(5.dp)
-                        .width(50.dp),
+                        .width(50.dp)
+                        .clickable(enabled = true, onClick = onEqualsClick),
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(2.dp, GRAYISH_WHITE)
                 ) {

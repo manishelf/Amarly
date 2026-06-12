@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -43,11 +44,10 @@
         </receiver>
 
         <activity
-            android:name="com.amarly.ui.reciever.AlarmReceiverUi"
+            android:name="com.amarly.ui.receiver.AlarmReceiverUi"
             android:excludeFromRecents="true"
             android:exported="false"
-            android:launchMode="singleInstance"
-            android:showOnLockScreen="true"
+            android:launchMode="singleTask"
             android:showWhenLocked="true"
             android:turnScreenOn="true" />
     </application>

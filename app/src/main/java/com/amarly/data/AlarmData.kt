@@ -11,8 +11,10 @@ data class AlarmData(
     var running: Boolean = false,
     var soundUri: String = "default",
     var vibration: LongArray = DEFAULT_VIB_PATTERN,
-    var maxSnooze: Int = 5,
+    var maxSnooze: Int = DEFAULT_MAX_SNOOZE,
     var puzzleType: PuzzleType = PuzzleType.SIMPLE_DISMISS,
+
+    var puzzleQuestionCount: Int = DEFAULT_PUZZLE_QUESTION_COUNT,
     var message: String = ""
 ) {
 
@@ -28,6 +30,10 @@ data class AlarmData(
         val SATURDAY = 1 shl 6
 
         val DEFAULT_VIB_PATTERN = longArrayOf(0, 500, 500)
+
+        val DEFAULT_PUZZLE_QUESTION_COUNT = 3
+
+        val DEFAULT_MAX_SNOOZE = 3
 
         val DAYS = listOf("S", "M", "T", "W", "T", "F", "S")
     }

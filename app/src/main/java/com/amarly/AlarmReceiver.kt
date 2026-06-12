@@ -12,7 +12,7 @@ import android.content.Intent
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.amarly.ui.reciever.AlarmReceiverUi
+import com.amarly.ui.receiver.AlarmReceiverUi
 
 class AlarmReceiver : BroadcastReceiver() {
     companion object {

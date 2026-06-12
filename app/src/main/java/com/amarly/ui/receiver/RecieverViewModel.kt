@@ -1,8 +1,11 @@
-package com.amarly.ui.reciever
+package com.amarly.ui.receiver
 
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
@@ -24,6 +27,7 @@ import com.amarly.ui.puzzle.PuzzleType
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.pow
 
 class RecieverViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -35,6 +39,9 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
             return alarm.maxSnooze
         }
 
+    val autoDismissEnabled: Boolean = true
+    val autoDismissInMin: Int = 20
+
     var interactionCountStart by mutableStateOf(System.currentTimeMillis())
     var interactionCountdownProgress by mutableStateOf(1f)
         private set
@@ -45,10 +52,19 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repo = FileRepo(app)
     private val scheduler = AlarmScheduler(app)
+
+    val puzzleQuestionCount: Int
+        get() {
+            return alarm.puzzleQuestionCount
+        }
+
     var mediaPlayer: MediaPlayer? = null
     var vibrator: Vibrator? = null
     var playingSound: Boolean = false
     var playingVibration: Boolean = false
+
+    var isDismissed: Boolean = false
+        private set
 
     private lateinit var alarm: AlarmData;
 
@@ -69,9 +85,29 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
         }
 
+        val audioManager = activity.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val devices = audioManager.getAvailableCommunicationDevices()
+
+            val speaker = devices.firstOrNull {
+                it.type == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+            }
+
+            speaker?.let {
+                audioManager.setCommunicationDevice(it)
+            }
+        }
+
         mediaPlayer = MediaPlayer().apply {
             setDataSource(activity, alarmSoundUri)
             isLooping = true
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+            )
             prepare()
         }
 
@@ -84,6 +120,8 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         startPlayback()
+
+        startAutoDismissTimer(activity)
     }
 
     val alarmMessage: String
@@ -91,12 +129,13 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
             return alarm.message
         }
 
-    fun dissmiss(activity: Activity, dismissTime: Long): Boolean {
+    fun dismiss(activity: Activity): Boolean {
         if (alarm.puzzleType == PuzzleType.SIMPLE_DISMISS || currPuzzle == alarm.puzzleType) {
             stopPlayback()
             NotificationManagerCompat.from(getApplication())
                 .cancel(alarm.id().hashCode())
             activity.finish()
+            isDismissed = true
         } else {
             currPuzzle = alarm.puzzleType
         }
@@ -112,17 +151,39 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun startPlayback() {
-        mediaPlayer?.start()
+        mediaPlayer?.apply {
+            setVolume(0f, 0f) // Start silent
+            start()
+        }
+        viewModelScope.launch {
+            val durationMs = 10_000L // Fade in over 10 seconds
+            val steps = 50
+            val delayPerStep = durationMs / steps
+
+            // log10 increase of volume
+            for (i in 0..steps) {
+                val progress = i.toFloat() / steps
+                val volume = (10.0.pow(progress.toDouble()) - 1) / 9
+                mediaPlayer?.setVolume(volume.toFloat(), volume.toFloat())
+                delay(delayPerStep)
+            }
+        }
+
         vibrator?.vibrate(
             VibrationEffect.createWaveform(alarm.vibration, 0)
         )
+
         playingSound = true
         playingVibration = true
     }
 
-    fun snooze(snoozeCount: Int, snoozeTimeInMin: Int = SNOOZE_TIME_IN_MIN): Boolean {
+    fun snooze(
+        snoozeCount: Int,
+        onComplete: () -> Unit = {},
+        snoozeTimeInMin: Int = SNOOZE_TIME_IN_MIN,
+    ) {
         if (snoozeCount > (alarm.maxSnooze)) {
-            return false
+            onComplete()
         } else {
             interactionCountdownProgress = 1f
             interactionCountStart = System.currentTimeMillis()
@@ -137,9 +198,25 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
                     delay(16)
                 }
                 startPlayback()
+                onComplete()
             }
         }
-        return true
+    }
+
+    fun startAutoDismissTimer(activity: Activity) {
+        if (autoDismissEnabled && autoDismissInMin > 0) {
+            val startTime = System.currentTimeMillis()
+            var triggerTime = autoDismissInMin * 60 * 1000 + startTime
+            val oneMin = 1 * 60 * 1000
+            viewModelScope.launch {
+                while (triggerTime > 0) {
+                    triggerTime -= oneMin
+                    delay(oneMin.toLong())
+                }
+                alarm.puzzleType = PuzzleType.SIMPLE_DISMISS
+                dismiss(activity)
+            }
+        }
     }
 
 }

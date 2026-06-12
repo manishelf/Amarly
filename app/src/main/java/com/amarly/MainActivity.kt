@@ -178,6 +178,7 @@ class MainActivity : ComponentActivity() {
         if (viewModel.getRootFolder() == null) {
             rootFolderPicker.launch(null)
         }
+        // TODO: extra permissions for boot reciever and display over lock screen
     }
 }
 

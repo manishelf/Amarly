@@ -1,5 +1,6 @@
-package com.amarly.ui.reciever
+package com.amarly.ui.receiver
 
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,12 +19,12 @@ import com.amarly.ui.theme.WHITE
 
 @Composable
 fun CountDownTimerCard(
-    perogress: Float,
+    progress: Float,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     val borderRadius = 20.dp
-
+    val visualProgress = EaseInOut.transform(progress)
     Box(
         modifier
             .fillMaxSize()
@@ -40,7 +41,7 @@ fun CountDownTimerCard(
             drawArc(
                 color = WHITE,
                 startAngle = 90f,
-                sweepAngle = 180f * perogress,
+                sweepAngle = 180f * visualProgress,
                 useCenter = true,
                 size = Size(diameter, diameter),
                 topLeft = topLeft,
@@ -48,7 +49,7 @@ fun CountDownTimerCard(
             drawArc(
                 color = WHITE,
                 startAngle = 90f,
-                sweepAngle = -180f * perogress,
+                sweepAngle = -180f * visualProgress,
                 useCenter = true,
                 size = Size(diameter, diameter),
                 topLeft = topLeft,

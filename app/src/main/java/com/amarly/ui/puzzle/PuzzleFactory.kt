@@ -6,14 +6,15 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +40,7 @@ enum class PuzzleType {
 interface PuzzleComp {
     @Composable
     fun Comp(
-        onSnooze: (Int) -> Boolean,
+        onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
         modifier: Modifier = Modifier,
@@ -47,12 +48,17 @@ interface PuzzleComp {
     )
 }
 
+/*
+* TODO: 2. Full expression tree
+* TODO: 3. copyPasta windows build
+* TODO: 4.
+* */
+
 @Composable
 fun Puzzle(
     type: PuzzleType,
-    maxSnoozeCount: Int = 5,
-    onSnooze: (Int) -> Boolean,
-    onDismiss: (Long) -> Boolean,
+    onSnooze: (Int, () -> Unit) -> Unit,
+    onDismiss: () -> Boolean,
     onInteraction: () -> Unit,
     totalQuestions: Int = 3,
     modifier: Modifier = Modifier
@@ -62,14 +68,12 @@ fun Puzzle(
         mutableStateOf(1)
     }
 
-    val startTime = rememberSaveable { System.currentTimeMillis() }
-
     val onDismissHandler = {
         if (questionNo < totalQuestions && type != PuzzleType.SIMPLE_DISMISS) {
             questionNo += 1
             false
         } else {
-            onDismiss(System.currentTimeMillis() - startTime)
+            onDismiss()
             true
         }
     }
@@ -85,6 +89,7 @@ fun Puzzle(
                 textAlign = TextAlign.Justify,
                 style = Typography.displayMedium
             )
+            Spacer(Modifier.height(20.dp))
         }
 
         AnimatedContent(
