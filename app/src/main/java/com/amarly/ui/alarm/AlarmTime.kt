@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.amarly.ui.theme.Typography
+import com.amarly.ui.theme.WHITE
 import java.time.ZonedDateTime
 
 @Composable
@@ -16,31 +17,35 @@ import java.time.ZonedDateTime
 fun AlarmTime(triggerTime: ZonedDateTime, modifier: Modifier = Modifier) {
     Row(
         modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         val hour = String.format("%02d", triggerTime.hour % 12)
         val minute = String.format("%02d", triggerTime.minute)
         Text(
             text = hour,
             Modifier,
-            style = Typography.displayLarge
+            style = Typography.displayLarge,
+            color = WHITE
         )
         Text(
             text = ":",
             modifier = Modifier.padding(
                 5.dp, 0.dp
             ),
-            style = Typography.displaySmall
+            style = Typography.displaySmall,
+            color = WHITE
         )
         Text(
             text = minute,
             modifier = Modifier,
-            style = Typography.displayLarge
+            style = Typography.displayLarge,
+            color = WHITE
         )
         Text(
             text = if (triggerTime.hour <= 12) "AM" else "PM",
             modifier = Modifier.padding(5.dp, 0.dp),
-            style = Typography.headlineLarge
+            style = Typography.headlineLarge,
+            color = WHITE
         )
     }
 }

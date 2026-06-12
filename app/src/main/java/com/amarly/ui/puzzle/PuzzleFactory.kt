@@ -25,14 +25,13 @@ import com.amarly.ui.theme.Typography
 enum class PuzzleType {
     SIMPLE_DISMISS,
 
-    // TODO: full expression tree
     MATH_EASY,
+    MATH_MEDIUM,
     MATH_HARD,
-    MATH_ADVANANCE,
+    MATH_ADVANCE,
 
     // TODO:
     TYPING,
-    TRIVIA,
     SCAN,
     QNA
 }
@@ -47,12 +46,6 @@ interface PuzzleComp {
         questionNumber: Int = 0,
     )
 }
-
-/*
-* TODO: 2. Full expression tree
-* TODO: 3. copyPasta windows build
-* TODO: 4.
-* */
 
 @Composable
 fun Puzzle(
@@ -85,11 +78,11 @@ fun Puzzle(
             Text(
                 text = "Q $questionNo/$totalQuestions",
                 modifier = Modifier
-                    .absolutePadding(50.dp, 100.dp, 50.dp, 20.dp),
+                    .absolutePadding(20.dp, 100.dp, 0.dp, 0.dp),
                 textAlign = TextAlign.Justify,
                 style = Typography.displayMedium
             )
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(40.dp))
         }
 
         AnimatedContent(
@@ -124,7 +117,7 @@ fun Puzzle(
                     )
                 }
 
-                PuzzleType.MATH_HARD -> {
+                PuzzleType.MATH_MEDIUM -> {
                     Math(2).Comp(
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
@@ -134,7 +127,17 @@ fun Puzzle(
                     )
                 }
 
-                PuzzleType.MATH_ADVANANCE -> {
+                PuzzleType.MATH_HARD -> {
+                    Math(3).Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNo = questionNo
+                    )
+                }
+
+                PuzzleType.MATH_ADVANCE -> {
                     Math(3).Comp(
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,

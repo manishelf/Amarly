@@ -30,7 +30,7 @@ fun formatMillis(millis: Long): String {
         if (days > 0) add("${days}d")
         if (hours > 0) add("${hours}h")
         if (minutes > 0) add("${minutes}m")
-        if (seconds > 0) add("${seconds}s")
+        if (seconds >= 0) add("${seconds}s")
     }.joinToString(" ")
 }
 
@@ -51,7 +51,7 @@ fun TopBar(
     }
     var message = ""
     if (triggerTimeMillis > -1)
-        message = "Will be ringing in\n" + formatMillis(triggerTimeMillis - currentTime)
+        message = "Ringing in " + formatMillis(triggerTimeMillis - currentTime)
     else
         message = "No alarms scheduled"
 

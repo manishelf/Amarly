@@ -1,6 +1,7 @@
 package com.amarly.ui.puzzle
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,91 +42,115 @@ import kotlin.random.Random
 
 enum class OPERATOR(
     val symbol: String,
+    val precedence: Int,
     val apply: (Float, Float) -> Float,
+    val lrAssoc: Boolean = true,
     val isUnary: Boolean = false
 ) {
     // easy
-    PLUS("+", { x, y -> x + y }),
-    MINUS("-", { x, y -> x - y }),
+    PLUS("+", 2, { x, y -> x + y }),
+    MINUS("-", 2, { x, y -> x - y }),
 
     // medium
     // TODO: these are broken as they require precedence
-    INC("++", { x, y -> x + 1 }, true),
-    DEC("--", { x, y -> x - 1 }, true),
-    MUL("*", { x, y -> x * y }),
-    DIV("/", { x, y -> if (y == 0f) 0f else x / y }),
-    MOD("%", { x, y -> if (y == 0f) 0f else x % y }),
+    INC("++", 1, { _, y -> y + 1 }, false, true),
+    DEC("--", 1, { _, y -> y - 1 }, false, true),
+    MUL("*", 3, { x, y -> x * y }),
+    DIV("/", 3, { x, y -> if (y == 0f) 0f else x / y }),
+    MOD("%", 4, { x, y -> if (y == 0f) 0f else ((x % y) + y) % y }),
 
     // ADVANCED
-    POW("^", { x, y -> x.pow(y) }, true),
-    AVG("avg", { x, y -> (x + y) / 2f }),
-    MAX("max", { x, y -> maxOf(x, y) }),
-    MIN("min", { x, y -> minOf(x, y) }),
-    ABS_DIFF("|-|", { x, y -> kotlin.math.abs(x - y) }),
-    CLAMP("clamp", { x, y -> x.coerceIn(0f, y) }),
-    SWAP("swap", { x, y -> y - x }),
-    LOG2("log2", { x, _ -> if (x <= 0f) 0f else log2(x) }, true)
+    POW("^", 5, { x, y -> x.pow(y) }),
+    AVG("avg", 2, { x, y -> (x + y) / 2f }),
+    MAX("max", 2, { x, y -> maxOf(x, y) }),
+    MIN("min", 2, { x, y -> minOf(x, y) }),
+    ABS_DIFF("|-|", 2, { x, y -> kotlin.math.abs(x - y) }),
+    CLAMP("clamp", 2, { x, y -> x.coerceIn(0f, y) }),
+    SWAP("swap", 2, { x, y -> y - x }),
+    LOG2("log2", 1, { _, y -> if (y <= 0f) 0f else log2(y) }, false, true)
 }
 
-val EASY = arrayOf(0, 2);
-val MEDIUM = arrayOf(0, 2);
-val ADVANCE = arrayOf(0, 2);
+val EASY = arrayOf(0, 2)
+val MEDIUM = arrayOf(EASY[0] + 1, EASY[1] + 5)
+val ADVANCE = arrayOf(MEDIUM[0] + 1, MEDIUM[1] + 8)
 
-class Expression(
-    val operators: Array<OPERATOR> = arrayOf(),
-    val operands: Array<Int> = arrayOf(),
+val numberRange = 1 until 1000
+val includeFloatNumbers = false
+
+val maxResult = 10_000
+
+class Node(
+    var op: OPERATOR? = null,
+    var value: Float = Float.NEGATIVE_INFINITY,
+    var l: Node? = null,
+    var r: Node? = null
 ) {
-    // TODO: this does not do precedence or association, that requires a expression tree
     fun eval(): Float {
-        var ptr = 1
-        var result = operands[0].toFloat()
-        for (i in operators.reversed()) {
-            result = i.apply(result, operands[ptr].toFloat())
-            if (!i.isUnary) {
-                ptr += 1
-            }
-        }
+        if (l == null && r == null) return value
 
-        return result
+        val operator = op ?: return Float.NEGATIVE_INFINITY
+
+        return if (operator.isUnary) {
+            if (operator.lrAssoc)
+                operator.apply(l!!.eval(), Float.NEGATIVE_INFINITY)
+            else
+                operator.apply(Float.NEGATIVE_INFINITY, r!!.eval())
+        } else {
+            operator.apply(l!!.eval(), r!!.eval())
+        }
     }
 
-    fun toStringPolish(): String {
-        val sb = StringBuilder();
-        for (i in operators) {
-            sb.append(i.symbol)
-            sb.append(" ")
+    fun forDisplay(value: Float): String {
+        return if (value - value.toInt() > 0f) {
+            String.format("%.2f", value)
+        } else {
+            value.toInt().toString()
         }
-        for (i in operands) {
-            sb.append(i.toString())
-            sb.append(" ")
-        }
-        return sb.toString()
     }
 
-    fun toStringReversePollish(): String {
-        val sb = StringBuilder();
-        for (i in operators) {
-            sb.append(i.symbol)
-            sb.append(" ")
+    fun infix(parentPrec: Int = Int.MAX_VALUE): String {
+        if (l == null && r == null) {
+            return forDisplay(value)
         }
-        for (i in operands) {
-            sb.append(i.toString())
-            sb.append(" ")
+
+        val operator = op!!
+        val p = operator.precedence
+
+        val expr = if (operator.isUnary) {
+            if (operator.lrAssoc)
+                "${l!!.infix(p)}${operator.symbol}"
+            else
+                "${operator.symbol}${r!!.infix(p)}"
+        } else {
+            "${l!!.infix(p)} ${operator.symbol} ${r!!.infix(p)}"
         }
-        return sb.toString()
+
+        return if (p < parentPrec && parentPrec != Int.MAX_VALUE) "($expr)" else expr
     }
 
-    fun toStringInfix(): String {
+    fun prefix(): String {
         val sb = StringBuilder()
 
-        for (i in operands.indices) {
-            sb.append(operands[i])
-            sb.append(" ")
+        if (op != null) {
+            op?.let { sb.append(it.symbol).append(" ") }
+        } else {
+            sb.append(forDisplay(value)).append(" ")
+        }
+        l?.let { sb.append(it.prefix()).append(" ") }
+        r?.let { sb.append(it.prefix()).append(" ") }
 
-            if (i < operators.size) {
-                sb.append(operators[i].symbol)
-                sb.append(" ")
-            }
+        return sb.toString()
+    }
+
+    fun postfix(): String {
+        val sb = StringBuilder()
+
+        l?.let { sb.append(it.postfix()).append(" ") }
+        r?.let { sb.append(it.postfix()).append(" ") }
+        if (op != null) {
+            op?.let { sb.append(it.symbol).append(" ") }
+        } else {
+            sb.append(forDisplay(value)).append(" ")
         }
 
         return sb.toString()
@@ -136,33 +161,70 @@ class Math(
     private val difficulty: Int = 1,
 ) : PuzzleComp {
 
-    fun getNextQuestion(): Expression {
+    fun getNextQuestion(): Node {
+
         val operandCount = when (difficulty) {
             1 -> 2
-            2 -> 3
-            3 -> 3
-            else -> difficulty // TODO
+            2, 3 -> 3
+            4, 5 -> 4
+            else -> difficulty
         }
-
-        // TODO: this does not do precedence or association, that requires a expression tree
         val operatorRange = when (difficulty) {
-            1, 2 -> EASY[0] until EASY[1]
+            1 -> EASY[0] until EASY[1]
+            2 -> EASY[0] until MEDIUM[1]
             3 -> MEDIUM[0] until MEDIUM[1]
-            else -> EASY[0] until ADVANCE[1] // TODO
+            else -> EASY[0] until ADVANCE[1]
+        }
+        val operators = Array(operandCount - 1) { OPERATOR.entries[operatorRange.random()] }
+
+        val nodes = MutableList(operandCount) {
+            if (includeFloatNumbers) {
+                Node(
+                    value = Random.nextDouble(
+                        numberRange.first.toDouble(),
+                        numberRange.last().toDouble()
+                    ).toFloat()
+                )
+            } else {
+                Node(value = Random.nextInt(numberRange.first, numberRange.last()).toFloat())
+            }
         }
 
-        val operators = Array(operandCount - 1) {
-            OPERATOR.entries[operatorRange.random()]
-        }
+        // This is cool
+        // same node list is used to make tree leaf to root
+        while (nodes.size > 1) {
+            val node = Node()
+            val op = operators.random()
+            node.op = op
 
-        val operands = Array(operandCount) {
-            Random.nextInt(1, 1000)
-        }
+            if (op.isUnary) {
+                val childIndex = Random.nextInt(nodes.size)
+                val child = nodes.removeAt(childIndex)
 
-        return Expression(
-            operators = operators,
-            operands = operands
-        )
+                if (op.lrAssoc) {
+                    node.l = child
+                } else {
+                    node.r = child
+                }
+            } else {
+                val i = Random.nextInt(nodes.size)
+                val left = nodes.removeAt(i)
+
+                val j = Random.nextInt(nodes.size)
+                val right = nodes.removeAt(j)
+
+                node.l = left
+                node.r = right
+            }
+
+            nodes.add(node)
+        }
+        val root = nodes.single()
+        val result = root.eval()
+        if (result > maxResult || result < -maxResult) {
+            return getNextQuestion()
+        }
+        return root
     }
 
     @Composable
@@ -198,9 +260,9 @@ class Math(
             ) {
                 Question(
                     text = when (difficulty) {
-                        1, 2 -> currQuestion.toStringInfix()
-                        3, 4 -> currQuestion.toStringPolish()
-                        else -> currQuestion.toStringReversePollish()
+                        1, 2 -> currQuestion.infix()
+                        3, 4 -> currQuestion.prefix()
+                        else -> currQuestion.postfix()
                     }
                 )
                 Spacer(Modifier.padding(20.dp))
@@ -236,10 +298,13 @@ class Math(
             modifier = modifier
                 .sizeIn(80.dp, 80.dp)
                 .fillMaxWidth()
+                .border(
+                    2.dp, GRAYISH_WHITE, RoundedCornerShape(10)
+                )
         ) {
             Text(
                 text = text,
-                style = Typography.displayMedium
+                style = Typography.displayMedium,
             )
         }
     }
@@ -260,7 +325,7 @@ class Math(
             border = BorderStroke(2.dp, GRAYISH_WHITE)
         ) {
             val fontSize = 50.sp
-            Row() {
+            Row(Modifier) {
                 Surface(
                     modifier = Modifier
                         .padding(5.dp)
