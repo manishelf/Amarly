@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
             AlarmData(
                 1,
                 ZonedDateTime.now().plusSeconds(10),
-                puzzleType = PuzzleType.MATH_EASY,
+                puzzleType = PuzzleType.QNA,
                 message = "Some sample text to test out the things"
             )
         )

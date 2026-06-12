@@ -22,6 +22,7 @@ fun AlarmItem(
     onToggle: (AlarmData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    // TODO: bug where once alarms cause others to look disabled in the list
     var running by remember {
         mutableStateOf(alarm.running)
     }

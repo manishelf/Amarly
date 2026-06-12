@@ -233,7 +233,7 @@ class Math(
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
         modifier: Modifier,
-        questionNo: Int, // For triggering re-render TODO: maybe use for progressive difficulty?
+        questionNumber: Int, // For triggering re-render TODO: maybe use for progressive difficulty?
     ) {
 
         val currQuestion by remember {

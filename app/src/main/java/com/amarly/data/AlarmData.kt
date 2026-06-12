@@ -9,7 +9,7 @@ data class AlarmData(
     val triggerTime: ZonedDateTime,
     var activeDays: Int = 0,
     var running: Boolean = false,
-    var soundUri: String = "default",
+    var soundUri: String = "",
     var vibration: LongArray = DEFAULT_VIB_PATTERN,
     var maxSnooze: Int = DEFAULT_MAX_SNOOZE,
     var puzzleType: PuzzleType = PuzzleType.SIMPLE_DISMISS,

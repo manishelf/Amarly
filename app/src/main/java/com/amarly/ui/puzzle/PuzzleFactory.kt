@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.amarly.ui.puzzle.QNA.QNA
 import com.amarly.ui.theme.Typography
 
 
@@ -78,11 +79,11 @@ fun Puzzle(
             Text(
                 text = "Q $questionNo/$totalQuestions",
                 modifier = Modifier
-                    .absolutePadding(20.dp, 100.dp, 0.dp, 0.dp),
+                    .absolutePadding(20.dp, 50.dp, 0.dp, 0.dp),
                 textAlign = TextAlign.Justify,
                 style = Typography.displayMedium
             )
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(20.dp))
         }
 
         AnimatedContent(
@@ -113,7 +114,7 @@ fun Puzzle(
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
                         modifier = Modifier,
-                        questionNo = questionNo
+                        questionNumber = questionNo
                     )
                 }
 
@@ -123,7 +124,7 @@ fun Puzzle(
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
                         modifier = Modifier,
-                        questionNo = questionNo
+                        questionNumber = questionNo
                     )
                 }
 
@@ -133,7 +134,7 @@ fun Puzzle(
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
                         modifier = Modifier,
-                        questionNo = questionNo
+                        questionNumber = questionNo
                     )
                 }
 
@@ -143,6 +144,17 @@ fun Puzzle(
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
                         modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA -> {
+                    QNA().Comp(
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
                     )
                 }
 
