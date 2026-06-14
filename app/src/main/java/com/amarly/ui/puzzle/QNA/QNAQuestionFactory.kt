@@ -1,6 +1,7 @@
 package com.amarly.ui.puzzle.QNA
 
 import android.content.Context
+import com.amarly.data.Difficulty
 import com.amarly.data.Question
 import com.amarly.repo.QuestionRepo
 
@@ -16,7 +17,10 @@ val a = 2
 val reasoning =
     "Some scientific reasoning yada yada yada \n or maybe some facts or something \n that can be verified or learned from"
 
-class QuestionFactory(private val context: Context) {
+class QuestionFactory(
+    private val context: Context,
+    private val questionDifficulty: Difficulty = Difficulty.MIX
+) {
 
     val repo = QuestionRepo(context)
 
@@ -32,22 +36,29 @@ class QuestionFactory(private val context: Context) {
 
         val index = repo.questionIndex
 
-        val categoryKey = index.categories.keys.random()
-        val category = index.categories[categoryKey]
-
-        val topicKey = category!!.keys.random()
-        val topic = category[topicKey]
-
-        var difficulty = topic!!.keys.random()
-        var questions = topic[difficulty]
-        while (questions!!.isEmpty()) {
-            difficulty = topic!!.keys.random()
-            questions = topic[difficulty]
+        // this is cool
+        val allowedDifficulties = if (questionDifficulty == Difficulty.MIX) {
+            Difficulty.entries.filter { it != Difficulty.MIX }
+        } else {
+            listOf(questionDifficulty)
         }
-        val questionUri = questions!!.random()
 
-        val question = repo.loadSingleQuestion(questionUri)
+        while (true) {
+            val category = index.categories.values.random()
+            val topic = category.values.random()
 
-        return question!!
+            val availableDifficulties = allowedDifficulties.filter {
+                !(topic[it]?.isEmpty()!!) // ;{
+            }
+
+            if (availableDifficulties.isEmpty()) {
+                continue
+            }
+
+            val difficulty = availableDifficulties.random()
+            val questionUri = topic[difficulty]!!.random()
+
+            return repo.loadSingleQuestion(questionUri)!!
+        }
     }
 }

@@ -57,7 +57,8 @@ class MathQ(
         questionNumber: Int, // For triggering re-render TODO: maybe use for progressive difficulty?
     ) {
 
-        val qf = MathQuestionFactory(context, difficulty)
+        val qf =
+            MathQuestionFactory(context, difficulty) // TODO:fix this, is created every recompose
 
         val currQuestion by remember {
             mutableStateOf(qf.getNextQuestion())
@@ -83,7 +84,7 @@ class MathQ(
             ) {
                 Question(
                     text = when (difficulty) {
-                        Difficulty.EASY, Difficulty.MEDIUM -> currQuestion.infix()
+                        Difficulty.EASY, Difficulty.MEDIUM, Difficulty.MIX -> currQuestion.infix()
                         Difficulty.HARD -> currQuestion.prefix()
                         else -> currQuestion.postfix()
                     }
@@ -95,7 +96,7 @@ class MathQ(
                     onValueChange = {
                         answerText = it
                         val answer = it.toFloatOrNull()
-                        if (answer != null && kotlin.math.abs(answer - result) < 0.001f) {
+                        if (answer != null && kotlin.math.abs(answer - result) < 0.1f) {
                             onDismiss()
                         }
                         onInteraction()

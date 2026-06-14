@@ -37,13 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.amarly.data.Difficulty
 import com.amarly.ui.puzzle.PuzzleComp
 import com.amarly.ui.theme.GRAYISH_WHITE
 import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
 import kotlinx.coroutines.delay
 
-class QNA : PuzzleComp {
+class QNA(private val difficulty: Difficulty = Difficulty.EASY) : PuzzleComp {
 
     @Composable
     override fun Comp(
@@ -54,7 +55,8 @@ class QNA : PuzzleComp {
         modifier: Modifier,
         questionNumber: Int
     ) {
-        val qf = QuestionFactory(context)
+
+        val qf = QuestionFactory(context, difficulty) // TODO:fix this, is created every recompose
         var penaltyActive by remember { mutableStateOf(false) }
         var showReasoning by remember { mutableStateOf(false) }
         var progress by remember { mutableFloatStateOf(0f) }

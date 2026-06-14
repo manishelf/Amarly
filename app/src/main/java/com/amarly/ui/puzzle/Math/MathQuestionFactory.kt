@@ -125,21 +125,22 @@ class Node(
 
 class MathQuestionFactory(
     private val context: Context,
-    private val difficulty: Difficulty = Difficulty.EASY
+    private val difficulty: Difficulty = Difficulty.MIX
 ) {
 
     fun getNextQuestion(): Node {
 
         val operandCount = when (difficulty) {
             Difficulty.EASY -> 2
-            Difficulty.MEDIUM, Difficulty.HARD -> 3
+            Difficulty.MEDIUM, Difficulty.HARD, Difficulty.MIX -> 3
             Difficulty.ADVANCE -> 4
         }
         val operatorRange = when (difficulty) {
             Difficulty.EASY -> EASY[0] until EASY[1]
             Difficulty.MEDIUM -> EASY[0] until MEDIUM[1]
             Difficulty.HARD -> MEDIUM[0] until MEDIUM[1]
-            Difficulty.ADVANCE -> EASY[0] until ADVANCE[1]
+            Difficulty.ADVANCE -> ADVANCE[0] until ADVANCE[1]
+            Difficulty.MIX -> EASY[0] until ADVANCE[0]
         }
         val operators = Array(operandCount - 1) { OPERATOR.entries[operatorRange.random()] }
 

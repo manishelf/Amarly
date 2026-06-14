@@ -4,7 +4,8 @@ enum class Difficulty {
     EASY,
     MEDIUM,
     HARD,
-    ADVANCE
+    ADVANCE,
+    MIX
 }
 
 data class Question(

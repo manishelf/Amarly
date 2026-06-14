@@ -33,11 +33,17 @@ enum class PuzzleType {
     MATH_MEDIUM,
     MATH_HARD,
     MATH_ADVANCE,
+    MATH_MIX,
+
+    QNA_EASY,
+    QNA_MEDIUM,
+    QNA_HARD,
+    QNA_ADVANCE,
+    QNA_MIX,
 
     // TODO:
     TYPING,
     SCAN,
-    QNA
 }
 
 interface PuzzleComp {
@@ -160,8 +166,63 @@ fun Puzzle(
                     )
                 }
 
-                PuzzleType.QNA -> {
-                    QNA().Comp(
+                PuzzleType.MATH_MIX -> {
+                    MathQ(Difficulty.MIX).Comp(
+                        context = context,
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA_EASY -> {
+                    QNA(Difficulty.EASY).Comp(
+                        context = context,
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA_MEDIUM -> {
+                    QNA(Difficulty.MEDIUM).Comp(
+                        context = context,
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA_HARD -> {
+                    QNA(Difficulty.HARD).Comp(
+                        context = context,
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA_ADVANCE -> {
+                    QNA(Difficulty.ADVANCE).Comp(
+                        context = context,
+                        onSnooze = onSnooze,
+                        onDismiss = onDismissHandler,
+                        onInteraction = onInteraction,
+                        modifier = Modifier,
+                        questionNumber = questionNo
+                    )
+                }
+
+                PuzzleType.QNA_MIX -> {
+                    QNA(Difficulty.MIX).Comp(
                         context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
