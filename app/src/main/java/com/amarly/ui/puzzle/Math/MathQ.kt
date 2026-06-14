@@ -1,6 +1,5 @@
 package com.amarly.ui.puzzle.Math
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,7 +49,6 @@ class MathQ(
 
     @Composable
     override fun Comp(
-        context: Context,
         onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,

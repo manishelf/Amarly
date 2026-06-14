@@ -14,6 +14,7 @@ fun AlarmList(
     modifier: Modifier = Modifier
 ) {
     val now = System.currentTimeMillis()
+    // TODO: This is messed up, deleting actually one alarm deletes different
     LazyColumn(modifier = modifier) {
         items(
             alarms.sortedBy {

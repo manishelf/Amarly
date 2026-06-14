@@ -51,7 +51,6 @@ enum class PuzzleType {
 interface PuzzleComp {
     @Composable
     fun Comp(
-        context: Context,
         onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
@@ -77,7 +76,7 @@ class PuzzleRegistry {
         val mqf = MathQuestionFactory(context)
         val qqf = QNAQuestionFactory(context)
 
-        map[PuzzleType.SIMPLE_DISMISS] = SnoozeDissmiss()
+        map[PuzzleType.SIMPLE_DISMISS] = SnoozeDismiss()
 
         map[PuzzleType.MATH_HARD] = MathQ(mqf, Difficulty.HARD)
         map[PuzzleType.MATH_EASY] = MathQ(mqf, Difficulty.EASY)
@@ -152,7 +151,6 @@ fun Puzzle(
 
             val comp = registry.getPuzzle(context, type)
             comp.Comp(
-                context = context,
                 onSnooze = onSnooze,
                 onDismiss = onDismissHandler,
                 onInteraction = onInteraction,

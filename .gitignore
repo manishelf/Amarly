@@ -8,9 +8,12 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 /.kotlin/errors
+/.kotlin/sessions
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+amarly_keystore
+app/release

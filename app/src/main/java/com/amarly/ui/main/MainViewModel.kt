@@ -35,8 +35,6 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun loadAlarms() {
         isLoaded = false
-        // requires context since it is coroutine?
-        // and requires priority?
         viewModelScope.launch(Dispatchers.IO) {
             val loaded = scheduler.registerAll(repo.getAllAlarms())
             withContext(Dispatchers.Main) {

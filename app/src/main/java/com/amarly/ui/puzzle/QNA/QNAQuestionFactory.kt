@@ -23,6 +23,8 @@ class QNAQuestionFactory(
 
     val repo = QuestionRepo(context)
 
+    val shuffleOptions = true
+
     fun getNextQuestion(questionDifficulty: Difficulty = Difficulty.MIX): Question {
         /*
         return Question(
@@ -57,7 +59,27 @@ class QNAQuestionFactory(
             val difficulty = availableDifficulties.random()
             val questionUri = topic[difficulty]!!.random()
 
-            return repo.loadSingleQuestion(questionUri)!!
+            val question = repo.loadSingleQuestion(questionUri)!!
+
+            question.answers = question.answers.map { it - 1 }.toTypedArray() // stored as one based
+
+            if (shuffleOptions) {
+                val oaMap = mutableMapOf<String, Int>()
+                for ((index, option) in question.options.withIndex()) {
+                    oaMap[option] = index
+                }
+                question.options.shuffle()
+                val newAnswers = mutableListOf<Int>()
+                for ((newIndex, option) in question.options.withIndex()) {
+                    val oldIndex = oaMap[option]
+                    if (question.answers.contains(oldIndex)) {
+                        newAnswers.add(newIndex)
+                    }
+                }
+                question.answers = newAnswers.toTypedArray()
+            }
+
+            return question
         }
     }
 }

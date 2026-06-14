@@ -1,6 +1,5 @@
 package com.amarly.ui.puzzle.QNA
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -51,7 +50,6 @@ class QNA(
 
     @Composable
     override fun Comp(
-        context: Context,
         onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
@@ -70,12 +68,13 @@ class QNA(
             mutableStateListOf<Int>()
         }
 
-        val checkAnswer = { i: Int ->
-            val index = i + 1
+        val checkAnswer = { index: Int ->
             if (!answers.contains(index)) {
                 answers.add(index)
             }
-            if (answers.toTypedArray().contentEquals(question.answers)) {
+            val answersArr = answers.toTypedArray()
+            answersArr.sort()
+            if (answersArr.contentEquals(question.answers)) {
                 showReasoning = true
                 answers.clear()
             } else if (!question.answers.contains(index)) {
