@@ -11,7 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,6 +48,7 @@ class AlarmReceiverUi : ComponentActivity() {
 
         viewModel.init(this, intent.getStringExtra("alarm_id") ?: return)
 
+
         window.addFlags(
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
                     WindowManager.LayoutParams.FLAG_BLUR_BEHIND or
@@ -62,7 +66,10 @@ class AlarmReceiverUi : ComponentActivity() {
                             if (!viewModel.alarmMessage.isEmpty())
                                 Text(
                                     text = viewModel.alarmMessage,
-                                    Modifier.padding(15.dp, 50.dp, 15.dp, 15.dp),
+                                    Modifier
+                                        .padding(15.dp, 50.dp, 15.dp, 15.dp)
+                                        .heightIn(50.dp)
+                                        .verticalScroll(rememberScrollState()),
                                     style = Typography.headlineLarge
                                 )
                         }
@@ -78,6 +85,7 @@ class AlarmReceiverUi : ComponentActivity() {
                             progress = viewModel.interactionCountdownProgress
                         ) {
                             Puzzle(
+                                context = this@AlarmReceiverUi,
                                 type = viewModel.currPuzzle,
                                 totalQuestions = viewModel.puzzleQuestionCount,
                                 onDismiss = {

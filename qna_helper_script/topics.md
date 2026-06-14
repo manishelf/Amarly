@@ -1,0 +1,685 @@
+# Comprehensive STEM Exam Study Topics
+
+## Mathematics
+- Sets, Relations and Functions
+- Complex Numbers and Quadratic Equations
+- Matrices and Determinants
+- Permutations and Combinations
+- Binomial Theorem and Applications
+- Sequence and Series
+- Limit, Continuity and Differentiability
+- Integral Calculus
+- Differential Equations
+- Coordinate Geometry
+- Three Dimensional Geometry
+- Vector Algebra
+- Statistics and Probability
+- Trigonometry
+- Linear Algebra
+- Calculus (Multivariable)
+- Numerical Methods
+
+## Physics
+- Units and Measurements
+- Kinematics
+- Laws of Motion
+- Work, Energy and Power
+- Rotational Motion
+- Gravitation
+- Properties of Solids and Liquids
+- Thermodynamics
+- Kinetic Theory of Gases
+- Oscillations and Waves
+- Electrostatics
+- Current Electricity
+- Magnetic Effects of Current and Magnetism
+- Electromagnetic Induction and Alternating Currents
+- Electromagnetic Waves
+- Optics
+- Dual Nature of Matter and Radiation
+- Atoms and Nuclei
+- Electronic Devices
+- Experimental Skills
+
+## Chemistry
+- Physical Chemistry
+  - Atomic Structure
+  - Chemical Bonding and Molecular Structure
+  - Chemical Thermodynamics
+  - Solutions
+  - Equilibrium
+  - Redox Reactions and Electrochemistry
+  - Chemical Kinetics
+  - Spectroscopy
+  - Surfaces and Interfaces
+- Inorganic Chemistry
+  - Classification of Elements and Periodicity
+  - Main Group Elements
+  - Transition Elements
+  - Lanthanides and Actinides
+  - Coordination Compounds
+  - Solids
+  - Instrumental Methods of Analysis
+  - Bioinorganic Chemistry
+  - Radioactivity
+- Organic Chemistry
+  - Stereochemistry
+  - Reaction Mechanisms
+  - Organic Synthesis
+  - Pericyclic Reactions and Photochemistry
+  - Heterocyclic Compounds
+  - Biomolecules
+  - Experimental Techniques in Organic Chemistry
+  - Hydrocarbons
+  - Organic Compounds Containing Halogens
+  - Organic Compounds Containing Oxygen
+  - Organic Compounds Containing Nitrogen
+  - Purification and Characterization of Organic Compounds
+  - Basic Principles of Organic Chemistry
+
+## Computer Science and Information Technology
+- Engineering Mathematics
+  - Discrete Mathematics
+  - Linear Algebra
+  - Calculus
+  - Probability and Statistics
+- Digital Logic
+  - Boolean Algebra
+  - Combinational and Sequential Circuits
+  - Number Representations and Computer Arithmetic
+- Computer Organization and Architecture
+  - Machine Instructions and Addressing Modes
+  - ALU, Data-path and Control Unit
+  - Instruction Pipelining
+  - Memory Hierarchy
+  - I/O Interface
+- Programming and Data Structures
+  - Programming in C
+  - Recursion
+  - Arrays, Stacks, Queues
+  - Linked Lists
+  - Trees and Binary Search Trees
+  - Binary Heaps
+  - Graphs
+- Algorithms
+  - Searching and Sorting
+  - Hashing
+  - Asymptotic Complexity Analysis
+  - Algorithm Design Techniques (Greedy, Dynamic Programming, Divide-and-Conquer)
+  - Graph Traversals
+  - Minimum Spanning Trees
+  - Shortest Paths
+- Theory of Computation
+  - Regular Expressions and Finite Automata
+  - Context-free Grammars and Push-down Automata
+  - Pumping Lemma
+  - Turing Machines and Undecidability
+- Compiler Design
+  - Lexical Analysis
+  - Parsing
+  - Syntax-directed Translation
+  - Runtime Environments
+  - Intermediate Code Generation
+  - Code Optimization
+  - Data Flow Analysis
+- Operating Systems
+  - System Calls, Processes, Threads
+  - Inter-process Communication
+  - Concurrency and Synchronization
+  - Deadlock
+  - CPU and I/O Scheduling
+  - Memory Management and Virtual Memory
+  - File Systems
+- Databases
+  - ER Model
+  - Relational Model and Relational Algebra
+  - Tuple Calculus and SQL
+  - Integrity Constraints and Normal Forms
+  - File Organization and Indexing
+  - Transactions and Concurrency Control
+- Computer Networks
+  - OSI and TCP/IP Protocol Stacks
+  - Packet, Circuit and Virtual Circuit Switching
+  - Data Link Layer (Framing, Error Detection, MAC, Ethernet)
+  - Routing Protocols
+  - IP Addressing and Fragmentation
+  - Network Address Translation (NAT)
+  - Transport Layer (UDP, TCP, Sockets)
+  - Application Layer Protocols (DNS, SMTP, HTTP, FTP, Email)
+
+## Electrical Engineering
+- Engineering Mathematics
+  - Linear Algebra
+  - Calculus
+  - Differential Equations
+  - Complex Variables
+  - Probability and Statistics
+- Electric Circuits
+  - Network Elements
+  - Network Solution Methods (KCL, KVL, Node and Mesh Analysis)
+  - Network Theorems (Thevenin's, Norton's, Superposition, Maximum Power Transfer)
+  - Transient Response
+  - Sinusoidal Steady-state Analysis
+  - Resonance
+  - Two Port Networks
+  - Three Phase Circuits
+  - Complex Power and Power Factor
+- Electromagnetic Fields
+  - Coulomb's Law and Electric Field
+  - Gauss's Law
+  - Electric Potential
+  - Capacitance
+  - Biot-Savart's Law and Ampere's Law
+  - Faraday's Law
+  - Inductance and Magnetic Circuits
+  - Self and Mutual Inductance
+- Signals and Systems
+  - Continuous and Discrete Time Signals
+  - Linear Time Invariant and Causal Systems
+  - Fourier Series and Fourier Transform
+  - Laplace Transform and Z Transform
+  - Sampling Theorem
+  - RMS and Average Value Calculations
+- Electrical Machines
+  - Single Phase Transformers
+  - Three-phase Transformers
+  - Auto-transformers
+  - DC Machines
+  - Three-phase Induction Machines
+  - Single-phase Induction Motors
+  - Synchronous Machines
+  - Losses and Efficiency Calculations
+  - Electromechanical Energy Conversion
+- Power Systems
+  - Electrical Power Generation
+  - AC and DC Transmission
+  - Transmission Lines and Cables Performance
+  - Economic Load Dispatch
+  - Series and Shunt Compensation
+  - Electric Field Distribution and Insulators
+  - Distribution Systems
+  - Per-unit Quantities
+  - Bus Admittance Matrix
+  - Load Flow Methods (Gauss-Seidel, Newton-Raphson)
+  - Voltage and Frequency Control
+  - Power Factor Correction
+  - Symmetrical Components
+  - Fault Analysis
+  - Protection Systems
+  - Circuit Breakers
+  - System Stability
+- Control Systems
+  - Mathematical Modelling and Representation
+  - Feedback Principle
+  - Transfer Functions
+  - Block Diagrams and Signal Flow Graphs
+  - Transient and Steady-state Analysis
+  - Stability Analysis (Routh-Hurwitz, Nyquist)
+  - Bode Plots and Root Loci
+  - Compensators (Lag, Lead, Lead-Lag)
+  - Controllers (P, PI, PID)
+  - State Space Models
+- Electrical and Electronic Measurements
+  - Bridges and Potentiometers
+  - Voltage, Current, Power, Energy Measurements
+  - Power Factor Measurement
+  - Instrument Transformers
+  - Digital Voltmeters and Multi-meters
+  - Phase, Time and Frequency Measurement
+  - Oscilloscopes
+  - Error Analysis
+- Analog and Digital Electronics
+  - Simple Diode Circuits
+  - Amplifiers (Biasing, Equivalent Circuit, Frequency Response)
+  - Oscillators and Feedback Amplifiers
+  - Operational Amplifiers
+  - Active Filters
+  - Combinatorial and Sequential Logic Circuits
+  - Multiplexers and Demultiplexers
+  - Schmitt Triggers
+  - Sample and Hold Circuits
+  - A/D and D/A Converters
+- Power Electronics
+  - Thyristor, MOSFET, IGBT Characteristics
+  - DC to DC Converters (Buck, Boost, Buck-Boost)
+  - Uncontrolled Rectifiers
+  - Thyristor-based Converters
+  - Bidirectional AC to DC Converters
+  - Line Current Harmonics
+  - Voltage and Current Source Inverters
+  - Sinusoidal Pulse Width Modulation
+
+## Mechanical Engineering (Fluid Mechanics)
+- Flow and Fluid Properties
+  - Fluid Properties
+  - Classification of Flows
+  - Hydrostatics
+- Kinematics of Fluid Motion
+  - Eulerian and Lagrangian Descriptions
+  - Local, Convective and Material Derivatives
+  - Streamline, Streakline, Pathline and Timeline
+- Integral Analysis for Control Volume
+  - Reynolds Transport Theorem
+  - Conservation of Mass, Linear and Angular Momentum
+- Differential Analysis
+  - Mass and Momentum Equations
+  - Euler Equations and Navier-Stokes Equations
+  - Fluid Rotation, Vorticity and Stream Function
+  - Circulation
+  - Exact Solutions (Couette, Poiseuille, Thin Film Flow)
+- Dimensional Analysis
+  - Geometric, Kinematic and Dynamic Similarity
+  - Buckingham Pi Theorem
+  - Non-dimensional Parameters (Reynolds, Froude, Mach Numbers)
+- Internal Flows
+  - Fully Developed Pipe Flow
+  - Friction Factor and Darcy-Weisbach Relation
+  - Moody's Chart
+  - Major and Minor Losses
+- Bernoulli's Equation and Applications
+  - Flow Measurements (Venturi, Pitot-static Tube, Orifice Meter)
+  - Elementary Potential Flows
+  - Superposition of Flows
+- External Flows
+  - Prandtl Boundary Layer Equations
+  - Boundary Layer Characteristics
+  - Boundary Layer Separation
+  - Streamlined and Bluff Bodies
+  - Drag and Lift Forces
+
+## Mechanical Engineering (Solid Mechanics)
+- Mechanics of Rigid Bodies
+  - Equivalent Force Systems
+  - Free-body Diagrams
+  - Equilibrium Equations
+  - Analysis of Determinate Trusses and Frames
+  - Friction
+  - Principle of Minimum Potential Energy
+  - Particle Kinematics and Dynamics
+  - Rigid Body Dynamics
+  - Conservation of Energy and Momentum
+- Mechanics of Deformable Bodies
+  - Stresses and Strains
+  - Transformation of Stresses and Strains
+  - Principal Stresses and Strains
+  - Mohr's Circle
+  - Generalized Hooke's Law
+  - Elastic Constants
+  - Thermal Stresses
+  - Theories of Failure
+  - Axial, Shear and Bending Stresses
+  - Combined Stresses
+  - Deflection
+  - Torsion in Circular Shafts
+  - Thin Walled Pressure Vessels
+  - Energy Methods (Castigliano's Theorems)
+  - Euler Buckling
+- Vibrations
+  - Free Vibration of Undamped Single Degree of Freedom Systems
+
+## Thermodynamics
+- Basic Concepts
+  - Continuum and Macroscopic Approach
+  - Thermodynamic Systems
+  - State Properties and Equilibrium
+  - State Diagrams, Paths and Processes
+  - Heat and Work Concepts
+  - Zeroth Law and Temperature
+- First Law of Thermodynamics
+  - Energy and Internal Energy
+  - Enthalpy and Specific Heats
+  - Applications to Closed Systems and Control Volumes
+  - Steady and Unsteady Flow Analysis
+- Second Law of Thermodynamics
+  - Heat Engines and Heat Pumps/Refrigerators
+  - Kelvin-Planck and Clausius Statements
+  - Reversible and Irreversible Processes
+  - Carnot Cycle and Carnot Principles
+  - Thermodynamic Temperature Scale
+  - Clausius Inequality and Entropy
+  - Microscopic Interpretation of Entropy
+  - Principle of Increase of Entropy
+  - T-s Diagrams
+  - Control Volume Analysis
+  - Availability and Irreversibility
+  - Third Law of Thermodynamics
+- Properties of Pure Substances
+  - Thermodynamic Properties in Different Phases
+  - PvT Behaviour
+  - Phase Rule
+  - Thermodynamic Property Tables and Charts
+  - Ideal and Real Gases
+  - Ideal Gas Equation of State
+  - Van der Waals Equation
+  - Compressibility Factor and Generalized Charts
+- Thermodynamic Relations
+  - TdS Relations
+  - Helmholtz and Gibbs Functions
+  - Maxwell Relations
+  - Joule-Thomson Coefficient
+  - Volume Expansion and Compressibility Coefficients
+  - Clapeyron and Clapeyron-Clausius Equations
+- Thermodynamic Cycles
+  - Carnot Vapor Cycle
+  - Ideal Rankine Cycle
+  - Rankine Reheat Cycle
+  - Air-standard Otto Cycle
+  - Air-standard Diesel Cycle
+  - Air-standard Brayton Cycle
+  - Vapor-compression Refrigeration Cycle
+- Ideal Gas Mixtures
+  - Dalton's and Amagat's Laws
+  - Properties of Ideal Gas Mixtures
+  - Air-water Vapor Mixtures
+  - Specific and Relative Humidities
+  - Dew Point and Wet Bulb Temperature
+  - Adiabatic Saturation Temperature
+  - Psychrometric Chart
+
+## Materials Science
+- Classification and Structure of Materials
+  - Metals, Ceramics, Polymers and Composites
+  - Nature of Bonding (Metallic, Ionic, Covalent, Mixed)
+  - Fundamentals of Crystallography
+  - Symmetry Operations and Crystal Systems
+  - Bravais Lattices and Unit Cells
+  - Primitive Cells
+  - Crystallographic Planes and Directions
+  - Structures of Metals, Ceramics, Polymers and Amorphous Materials
+  - Glasses
+  - Defects in Crystalline Materials (0-D, 1-D, 2-D)
+  - Vacancies and Interstitials
+  - Solid Solutions
+  - Frenkel and Schottky Defects
+  - Dislocations
+  - Grain Boundaries, Twins and Stacking Faults
+  - Surfaces and Interfaces
+- Thermodynamics, Kinetics and Phase Transformations
+  - Extensive and Intensive Properties
+  - Laws of Thermodynamics
+  - Phase Equilibria and Phase Rule
+  - Phase Diagrams (Unary and Binary)
+  - Basic Electrochemistry
+  - Reaction Kinetics
+  - Fundamentals of Diffusion
+  - Fick's Laws and Solutions
+  - Solidification of Pure Metals and Alloys
+  - Nucleation and Growth
+  - Diffusional Solid-state Phase Transformations
+  - Precipitation and Eutectoid
+  - Martensitic Transformation
+- Properties and Applications of Materials
+  - Mechanical Properties (Stress-strain Response)
+  - Elastic, Anelastic and Plastic Deformation
+  - Electronic Properties (Free Electron Theory, Fermi Energy, Band Theory)
+  - Semiconductors
+  - Hall Effect
+  - Dielectric Behaviour
+  - Piezo- and Ferro-electric Behaviour
+  - Magnetic Properties (Para-, Dia-, Ferro- and Ferrimagnetism)
+  - Thermal Properties (Specific Heat, Heat Conduction, Thermal Diffusivity, Thermal Expansion, Thermoelectricity)
+  - Optical Properties (Refractive Index, Absorption, Transmission)
+  - Applications of Materials
+- Characterization and Measurements of Properties
+  - X-ray Diffraction
+  - Spectroscopic Techniques (UV-Vis, IR, Raman)
+  - Optical and Electron Microscopy
+  - Composition Analysis
+  - Tensile Testing
+  - Hardness Measurement
+  - Electrical Conductivity and Carrier Mobility
+  - Thermal Analysis (Thermogravimetry, Calorimetry)
+- Processing of Materials
+  - Heat Treatment of Ferrous and Aluminium Alloys
+  - Ceramic Powder Preparation
+  - Sintering
+  - Thin Film Deposition (Evaporation, Sputtering, Chemical Vapour Deposition)
+  - Thin Film Growth Phenomena
+- Degradation of Materials
+  - Corrosion and Prevention
+  - Embrittlement of Metals
+  - Polymer Degradation
+
+## Chemical Engineering
+- Engineering Mathematics
+  - Linear Algebra
+  - Calculus (Multivariable, Partial Derivatives, Vector Calculus)
+  - Differential Equations
+  - Complex Variables
+  - Probability and Statistics
+  - Numerical Methods
+- Process Calculations and Thermodynamics
+  - Steady and Unsteady State Mass and Energy Balances
+  - Multiphase and Multicomponent Systems
+  - Reacting and Non-reacting Systems
+  - Tie Components
+  - Recycle, Bypass and Purge Calculations
+  - Gibb's Phase Rule and Degree of Freedom Analysis
+  - First and Second Laws of Thermodynamics
+  - Thermodynamic Properties of Pure Substances
+  - Equation of State and Residual Properties
+  - Properties of Mixtures
+  - Partial Molar Properties
+  - Fugacity and Activity Coefficients
+  - Phase Equilibria and VLE
+  - Chemical Reaction Equilibrium
+- Fluid Mechanics and Mechanical Operations
+  - Fluid Statics and Surface Tension
+  - Newtonian and Non-Newtonian Fluids
+  - Transport Properties
+  - Shell Balances
+  - Bernoulli Equation and Energy Balance
+  - Continuity and Momentum Equations
+  - Mechanical Energy Equation
+  - Macroscopic Friction Factors
+  - Dimensional Analysis and Similitude
+  - Flow Through Pipeline Systems
+  - Velocity Profiles and Flow Meters
+  - Pumps and Compressors
+  - Boundary Layer Theory
+  - Flow Past Immersed Bodies
+  - Packed and Fluidized Beds
+  - Turbulent Flow
+  - Particle Size and Shape
+  - Size Distribution and Reduction
+  - Classification of Solid Particles
+  - Free and Hindered Settling
+  - Centrifuges and Cyclones
+  - Thickening and Classification
+  - Filtration
+  - Agitation and Mixing
+  - Conveying of Solids
+- Heat Transfer
+  - Equation of Energy
+  - Steady and Unsteady Heat Conduction
+  - Convection and Radiation
+  - Thermal Boundary Layer
+  - Heat Transfer Coefficients
+  - Boiling, Condensation and Evaporation
+  - Types of Heat Exchangers and Evaporators
+  - Process Calculations for Heat Exchangers
+  - Design of Double Pipe and Shell-tube Heat Exchangers
+  - Single and Multiple Effect Evaporators
+- Mass Transfer
+  - Fick's Laws
+  - Molecular Diffusion in Fluids
+  - Mass Transfer Coefficients
+  - Film, Penetration and Surface Renewal Theories
+  - Momentum, Heat and Mass Transfer Analogies
+  - Stage-wise and Continuous Contacting
+  - Stage Efficiencies
+  - HTU and NTU Concepts
+  - Distillation Equipment
+  - Absorption and Adsorption
+  - Leaching and Liquid-liquid Extraction
+  - Drying, Humidification and Dehumidification
+  - Membrane Separations (Micro-, Ultra-, Nano-filtration and Reverse Osmosis)
+- Chemical Reaction Engineering
+  - Theories of Reaction Rates
+  - Kinetics of Homogeneous Reactions
+  - Interpretation of Kinetic Data
+  - Single and Multiple Reactions in Ideal Reactors
+  - Enzyme Reactions (Michaelis-Menten, Monod Models)
+  - Non-ideal Reactors
+  - Residence Time Distribution
+  - Single Parameter Models
+  - Non-isothermal Reactors
+  - Heterogeneous Catalytic Reactions
+  - Diffusion Effects in Catalysis
+  - Catalyst Deactivation
+- Instrumentation and Process Control
+  - Measurement of Process Variables
+  - Sensors and Transducers
+  - P&ID Equipment Symbols
+  - Process Modelling and Linearization
+  - Transfer Functions and Dynamic Responses
+  - Systems with Inverse Response
+  - Process Reaction Curve
+  - Controller Modes (P, PI, PID)
+  - Control Valves
+  - Transducer Dynamics
+  - Closed Loop System Analysis
+  - Stability Analysis
+  - Frequency Response
+  - Controller Tuning
+  - Cascade and Feed Forward Control
+- Plant Design and Economics
+  - Process Economics and Cost Estimation
+  - Depreciation and Total Annualized Cost
+  - Cost Indices
+  - Rate of Return and Payback Period
+  - Discounted Cash Flow
+  - Optimization in Process Design
+  - Sizing of Chemical Engineering Equipment
+- Chemical Technology
+  - Inorganic Chemical Industries (Sulfuric Acid, Phosphoric Acid, Chlor-alkali)
+  - Fertilizer Industries (Ammonia, Urea, SSP, TSP)
+  - Natural Products Industries (Pulp and Paper, Sugar, Oil and Fats)
+  - Petroleum Refining and Petrochemicals
+  - Polymerization Industries (Polyethylene, Polypropylene, PVC, Polyester Synthetic Fibers)
+
+## Energy Science
+- Energy Resources and Conversion Technologies
+  - Fossil Energy Resources (Reserves, Unconventional Resources, Peak Oil Theory)
+  - Nuclear Energy Resources (Binding Energy, Radioactive Decay, Fission, Fusion)
+  - Solar Thermal Systems (Solar Radiation, Geometry, Efficiency, Collectors)
+  - Solar Photovoltaic Systems (I-V Characteristics, Efficiency, Fill Factor, Sizing)
+  - Biomass (Resources, Composition, Conversion Methods, Biofuels)
+  - Wind Energy (Wind Resource Analysis, Turbine Types, Betz Limit, Design Considerations)
+  - Hydropower (Resources, Power Plants, Turbine Types)
+- Energy Storage, Economics, Environment, and Efficiency
+  - Energy Storage Systems (Batteries, Thermal Storage, Pumped Hydro, Compressed Air)
+  - Battery Characteristics (Capacity, C-rate, State of Charge, Depth of Discharge, Densities)
+  - Charging, Discharging and Round-trip Efficiency
+  - Economic Analysis (Payback Period, Time Value of Money, Present Worth, NPV, IRR)
+  - Life Cycle Costing and Levelized Cost of Energy
+  - Environmental Impacts (Air Pollution, GHG Emissions, Emission Factors)
+  - Energy Auditing (Methodology, Trend Analysis)
+  - Electrical Systems (Demand Side Management, Power Factor Correction)
+  - Motor Efficiency and Energy Efficient Motors
+  - Lighting (Levels, Efficient Options, Daylighting)
+  - Thermal and Mechanical Systems (Insulation, Compressors, Pumps, Boilers)
+
+## Biology
+- Biomolecules
+  - Mono- and Di-saccharides
+  - Amino Acids and Physicochemical Properties
+  - Chemical Synthesis of Peptides
+  - Peptide and Protein Structure Determination
+  - Protein Structural Features
+  - Nucleic Acids
+  - Lipids, Steroids, Terpenoids, Carotenoids, Alkaloids
+- Respiration and Energy Transfer
+  - Cellular Respiration Processes
+  - Energy Production and Transfer
+- Human Nutrition
+  - Nutritional Requirements
+  - Dietary Components
+  - Metabolism
+- Excretion and Osmoregulation
+  - Excretory Systems
+  - Homeostatic Mechanisms
+  - Osmotic Regulation
+
+## General Knowledge and Aptitude
+- Logical Reasoning
+  - Problem Solving
+  - Pattern Recognition
+  - Abstract Reasoning
+  - Critical Thinking
+- Quantitative Aptitude
+  - Numerical Calculations
+  - Ratio and Proportion
+  - Percentage
+  - Data Interpretation
+  - Graph and Chart Analysis
+- Verbal Ability
+  - Reading Comprehension
+  - Grammar
+  - Vocabulary
+  - Synonyms and Antonyms
+  - Sentence Correction
+  - Comprehension of Passages
+
+## Architecture and Design
+- Building Technology
+  - Building Systems and Science
+  - Building Services
+  - Green Building Concepts
+  - Construction Materials
+- Environment and Ecology
+  - Landscape Design
+  - Environmental Laws and Regulations
+  - Environmental Design Strategies
+- Architecture History and Humanities
+  - Art and Culture
+  - Architectural Theory
+  - Major Architecture Movements
+- Settlement, Design and Planning
+  - Urbanization and Urbanism
+  - Urban and Rural Systems
+  - Infrastructure Planning
+- Current Architecture Practice
+  - National Building Code
+  - Town Planning Laws
+  - Regulatory and Professional Bodies
+- Visualization and Illustration
+  - Sketching and Illustration Skills
+  - Perspective and Proportion
+  - Composition and Shading
+- Design Thinking
+  - Problem Identification
+  - Alternative Solutions
+  - Evaluation and Development
+
+## Hospitality and Tourism Management
+- Food and Beverage Operations
+  - Service Operations and Terminology
+  - Inventory Control
+  - Equipment and Infrastructure
+  - Operation Management
+- Food Production
+  - Production Operations
+  - Indian and International Cuisines
+  - Bakery and Confectionery
+  - Hygiene and Safety Standards
+  - Equipment and Infrastructure
+- Rooms Division
+  - Housekeeping Operations
+  - Front Office Operations
+  - Planning and Design of Hospitality Organizations
+  - Laundry Operations
+- English Language
+  - Word Meaning and Spelling
+  - Comprehension
+  - Synonyms and Antonyms
+  - Idioms and Phrases
+- Hospitality and Tourism Industry
+  - Types of Tourism
+  - Hotel and Restaurant Brands
+  - Airlines and Industry Segments
+  - Global Trends
+  - Technology in Hotels
+  - Regulatory Bodies
+
+---

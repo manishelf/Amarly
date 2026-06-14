@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import com.amarly.data.AlarmData
 import com.amarly.ui.alarm.AlarmList
 import com.amarly.ui.main.ActionButton
 import com.amarly.ui.main.BottomBar
@@ -31,8 +32,10 @@ import com.amarly.ui.main.SnackbarHost
 import com.amarly.ui.main.TimePickerDialogue
 import com.amarly.ui.main.TimePickerType
 import com.amarly.ui.main.TopBar
+import com.amarly.ui.puzzle.PuzzleType
 import com.amarly.ui.theme.AmarlyTheme
 import java.time.Instant
+import java.time.ZonedDateTime
 
 class MainActivity : ComponentActivity() {
     // what does by mean here?
@@ -60,7 +63,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         checkPermissions()
-        /*
         viewModel.addAlarm(
             AlarmData(
                 1,
@@ -69,7 +71,6 @@ class MainActivity : ComponentActivity() {
                 message = "Some sample text to test out the things"
             )
         )
-         */
 
         setContent {
             AmarlyTheme {

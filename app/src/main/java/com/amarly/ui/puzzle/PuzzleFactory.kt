@@ -1,5 +1,6 @@
 package com.amarly.ui.puzzle
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.amarly.data.Difficulty
+import com.amarly.ui.puzzle.Math.MathQ
 import com.amarly.ui.puzzle.QNA.QNA
 import com.amarly.ui.theme.Typography
 
@@ -40,6 +43,7 @@ enum class PuzzleType {
 interface PuzzleComp {
     @Composable
     fun Comp(
+        context: Context,
         onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,
@@ -50,6 +54,7 @@ interface PuzzleComp {
 
 @Composable
 fun Puzzle(
+    context: Context,
     type: PuzzleType,
     onSnooze: (Int, () -> Unit) -> Unit,
     onDismiss: () -> Boolean,
@@ -72,7 +77,9 @@ fun Puzzle(
         }
     }
 
-    Card(modifier) {
+    Card(
+        modifier
+    ) {
 
         // include question no simply for re-rendering
         if (type != PuzzleType.SIMPLE_DISMISS && questionNo > 0) {
@@ -101,6 +108,7 @@ fun Puzzle(
             when (type) {
                 PuzzleType.SIMPLE_DISMISS -> {
                     SnoozeDissmiss().Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
@@ -109,7 +117,8 @@ fun Puzzle(
                 }
 
                 PuzzleType.MATH_EASY -> {
-                    Math(1).Comp(
+                    MathQ(Difficulty.EASY).Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
@@ -119,7 +128,8 @@ fun Puzzle(
                 }
 
                 PuzzleType.MATH_MEDIUM -> {
-                    Math(2).Comp(
+                    MathQ(Difficulty.MEDIUM).Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
@@ -129,7 +139,8 @@ fun Puzzle(
                 }
 
                 PuzzleType.MATH_HARD -> {
-                    Math(3).Comp(
+                    MathQ(Difficulty.HARD).Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
@@ -139,7 +150,8 @@ fun Puzzle(
                 }
 
                 PuzzleType.MATH_ADVANCE -> {
-                    Math(3).Comp(
+                    MathQ(Difficulty.ADVANCE).Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,
@@ -150,6 +162,7 @@ fun Puzzle(
 
                 PuzzleType.QNA -> {
                     QNA().Comp(
+                        context = context,
                         onSnooze = onSnooze,
                         onDismiss = onDismissHandler,
                         onInteraction = onInteraction,

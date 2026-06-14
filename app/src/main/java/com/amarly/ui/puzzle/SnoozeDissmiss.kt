@@ -1,5 +1,6 @@
 package com.amarly.ui.puzzle
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import com.amarly.ui.theme.Typography
 class SnoozeDissmiss : PuzzleComp {
     @Composable
     override fun Comp(
+        context: Context,
         onSnooze: (Int, () -> Unit) -> Unit,
         onDismiss: () -> Boolean,
         onInteraction: () -> Unit,

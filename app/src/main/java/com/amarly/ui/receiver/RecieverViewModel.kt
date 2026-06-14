@@ -75,7 +75,8 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
             alarm.running = false
             viewModelScope.launch {
                 repo.saveOne(alarm)
-                scheduler.registerAll(repo.getAllAlarms())
+                scheduler.clear(alarm)
+                //repo.deleteOneAlarm(alarm)
             }
         }
 

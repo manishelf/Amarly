@@ -17,7 +17,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 class FileRepo(private val context: Context) {
     companion object {
         private const val PREFS = "almarly_prefs"
-        private const val KEY_FOLDER_URI = "almarly_root_folder_uri"
+        private const val KEY_FOLDER = "amarly_root_folder_uri"
     }
 
     val mapper: ObjectMapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
@@ -28,13 +28,13 @@ class FileRepo(private val context: Context) {
     fun setRootFolder(uri: Uri?) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             .edit {
-                putString(KEY_FOLDER_URI, uri.toString())
+                putString(KEY_FOLDER, uri.toString())
             }
     }
 
     fun getRootFolder(): Uri? {
         val uriString = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_FOLDER_URI, null)
+            .getString(KEY_FOLDER, null)
         return uriString?.let(Uri::parse)
     }
 
