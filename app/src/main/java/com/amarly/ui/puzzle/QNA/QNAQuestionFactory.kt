@@ -17,14 +17,13 @@ val a = 2
 val reasoning =
     "Some scientific reasoning yada yada yada \n or maybe some facts or something \n that can be verified or learned from"
 
-class QuestionFactory(
+class QNAQuestionFactory(
     private val context: Context,
-    private val questionDifficulty: Difficulty = Difficulty.MIX
 ) {
 
     val repo = QuestionRepo(context)
 
-    fun getNextQuestion(): Question {
+    fun getNextQuestion(questionDifficulty: Difficulty = Difficulty.MIX): Question {
         /*
         return Question(
             text = q,

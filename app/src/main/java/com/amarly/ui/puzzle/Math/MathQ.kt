@@ -44,6 +44,7 @@ import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
 
 class MathQ(
+    private val qf: MathQuestionFactory,
     private val difficulty: Difficulty = Difficulty.EASY,
 ) : PuzzleComp {
 
@@ -57,11 +58,8 @@ class MathQ(
         questionNumber: Int, // For triggering re-render TODO: maybe use for progressive difficulty?
     ) {
 
-        val qf =
-            MathQuestionFactory(context, difficulty) // TODO:fix this, is created every recompose
-
         val currQuestion by remember {
-            mutableStateOf(qf.getNextQuestion())
+            mutableStateOf(qf.getNextQuestion(difficulty))
         }
 
         var answerText by remember {

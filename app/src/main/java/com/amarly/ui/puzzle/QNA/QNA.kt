@@ -44,7 +44,10 @@ import com.amarly.ui.theme.Typography
 import com.amarly.ui.theme.WHITE
 import kotlinx.coroutines.delay
 
-class QNA(private val difficulty: Difficulty = Difficulty.EASY) : PuzzleComp {
+class QNA(
+    private val qf: QNAQuestionFactory,
+    private val difficulty: Difficulty = Difficulty.EASY,
+) : PuzzleComp {
 
     @Composable
     override fun Comp(
@@ -56,12 +59,11 @@ class QNA(private val difficulty: Difficulty = Difficulty.EASY) : PuzzleComp {
         questionNumber: Int
     ) {
 
-        val qf = QuestionFactory(context, difficulty) // TODO:fix this, is created every recompose
         var penaltyActive by remember { mutableStateOf(false) }
         var showReasoning by remember { mutableStateOf(false) }
         var progress by remember { mutableFloatStateOf(0f) }
         val question by remember {
-            mutableStateOf(qf.getNextQuestion())
+            mutableStateOf(qf.getNextQuestion(difficulty))
         }
 
         val answers = remember {

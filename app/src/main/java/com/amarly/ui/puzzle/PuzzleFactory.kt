@@ -22,7 +22,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.amarly.data.Difficulty
 import com.amarly.ui.puzzle.Math.MathQ
+import com.amarly.ui.puzzle.Math.MathQuestionFactory
 import com.amarly.ui.puzzle.QNA.QNA
+import com.amarly.ui.puzzle.QNA.QNAQuestionFactory
 import com.amarly.ui.theme.Typography
 
 
@@ -58,6 +60,40 @@ interface PuzzleComp {
     )
 }
 
+class PuzzleRegistry {
+    var map: MutableMap<PuzzleType, PuzzleComp>? = null
+
+    fun getPuzzle(context: Context, type: PuzzleType): PuzzleComp {
+        if (map == null) {
+            map = init(context)
+            return map?.get(type)!!
+        }
+        return map?.get(type)!!
+    }
+
+    fun init(context: Context): MutableMap<PuzzleType, PuzzleComp> {
+        val map = mutableMapOf<PuzzleType, PuzzleComp>()
+
+        val mqf = MathQuestionFactory(context)
+        val qqf = QNAQuestionFactory(context)
+
+        map[PuzzleType.SIMPLE_DISMISS] = SnoozeDissmiss()
+
+        map[PuzzleType.MATH_HARD] = MathQ(mqf, Difficulty.HARD)
+        map[PuzzleType.MATH_EASY] = MathQ(mqf, Difficulty.EASY)
+        map[PuzzleType.MATH_MEDIUM] = MathQ(mqf, Difficulty.MEDIUM)
+        map[PuzzleType.MATH_ADVANCE] = MathQ(mqf, Difficulty.ADVANCE)
+        map[PuzzleType.MATH_MIX] = MathQ(mqf, Difficulty.MIX)
+
+        map[PuzzleType.QNA_EASY] = QNA(qqf, Difficulty.EASY)
+        map[PuzzleType.QNA_MEDIUM] = QNA(qqf, Difficulty.MEDIUM)
+        map[PuzzleType.QNA_HARD] = QNA(qqf, Difficulty.HARD)
+        map[PuzzleType.QNA_ADVANCE] = QNA(qqf, Difficulty.ADVANCE)
+        map[PuzzleType.QNA_MIX] = QNA(qqf, Difficulty.MIX)
+        return map
+    }
+}
+
 @Composable
 fun Puzzle(
     context: Context,
@@ -71,6 +107,10 @@ fun Puzzle(
 
     var questionNo by remember {
         mutableStateOf(1)
+    }
+
+    val registry by remember {
+        mutableStateOf(PuzzleRegistry())
     }
 
     val onDismissHandler = {
@@ -110,132 +150,14 @@ fun Puzzle(
         ) { it ->
             val ignore = it
 
-            // TODO: this should be a registry with auto discovery or something
-            when (type) {
-                PuzzleType.SIMPLE_DISMISS -> {
-                    SnoozeDissmiss().Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                    )
-                }
-
-                PuzzleType.MATH_EASY -> {
-                    MathQ(Difficulty.EASY).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.MATH_MEDIUM -> {
-                    MathQ(Difficulty.MEDIUM).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.MATH_HARD -> {
-                    MathQ(Difficulty.HARD).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.MATH_ADVANCE -> {
-                    MathQ(Difficulty.ADVANCE).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.MATH_MIX -> {
-                    MathQ(Difficulty.MIX).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.QNA_EASY -> {
-                    QNA(Difficulty.EASY).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.QNA_MEDIUM -> {
-                    QNA(Difficulty.MEDIUM).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.QNA_HARD -> {
-                    QNA(Difficulty.HARD).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.QNA_ADVANCE -> {
-                    QNA(Difficulty.ADVANCE).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                PuzzleType.QNA_MIX -> {
-                    QNA(Difficulty.MIX).Comp(
-                        context = context,
-                        onSnooze = onSnooze,
-                        onDismiss = onDismissHandler,
-                        onInteraction = onInteraction,
-                        modifier = Modifier,
-                        questionNumber = questionNo
-                    )
-                }
-
-                else -> {
-                    Text("Unknown puzzle type")
-                }
-            }
+            val comp = registry.getPuzzle(context, type)
+            comp.Comp(
+                context = context,
+                onSnooze = onSnooze,
+                onDismiss = onDismissHandler,
+                onInteraction = onInteraction,
+                modifier = Modifier,
+            )
         }
     }
 }

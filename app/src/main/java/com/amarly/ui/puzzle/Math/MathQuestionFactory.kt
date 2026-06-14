@@ -125,10 +125,9 @@ class Node(
 
 class MathQuestionFactory(
     private val context: Context,
-    private val difficulty: Difficulty = Difficulty.MIX
 ) {
 
-    fun getNextQuestion(): Node {
+    fun getNextQuestion(difficulty: Difficulty = Difficulty.MIX): Node {
 
         val operandCount = when (difficulty) {
             Difficulty.EASY -> 2

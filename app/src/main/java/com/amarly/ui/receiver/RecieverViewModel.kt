@@ -72,8 +72,8 @@ class RecieverViewModel(app: Application) : AndroidViewModel(app) {
 
         alarm = repo.getById(alarmId) ?: alarm
         if (alarm.activeDays == AlarmData.DAY_NONE) {
-            alarm.running = false
             viewModelScope.launch {
+                alarm.running = false
                 repo.saveOne(alarm)
                 scheduler.clear(alarm)
                 //repo.deleteOneAlarm(alarm)
