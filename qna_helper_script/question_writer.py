@@ -143,7 +143,7 @@ def create_directory_structure(
 
 def generate_questions(
     json_file: str,
-    output_root: str = "questions",
+    output_root: str = "qna",
 ) -> None:
     """Main generator."""
 
@@ -253,8 +253,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--output",
-        default="questions",
-        help="Output root folder (default: questions)",
+        default="qna",
+        help="Output root folder (default: qna)",
     )
 
     args = parser.parse_args()
