@@ -24,7 +24,8 @@ fun AlarmList(
                 } else {
                     Long.MAX_VALUE
                 }
-            }
+            },
+            key = { it.id() }
         ) { alarm ->
             if (onDelete != {})
                 AlarmItemWithDelete(

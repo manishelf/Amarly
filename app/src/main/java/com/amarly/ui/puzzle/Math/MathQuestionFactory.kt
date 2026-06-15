@@ -13,16 +13,17 @@ enum class OPERATOR(
     val lrAssoc: Boolean = true,
     val isUnary: Boolean = false
 ) {
-    // easy
+    // EASY
     PLUS("+", 2, { x, y -> x + y }),
     MINUS("-", 2, { x, y -> x - y }),
 
-    // medium
-    // TODO: these are broken as they require precedence
-    INC("++", 1, { _, y -> y + 1 }, false, true),
-    DEC("--", 1, { _, y -> y - 1 }, false, true),
+    // MEDIUM
     MUL("*", 3, { x, y -> x * y }),
     DIV("/", 3, { x, y -> if (y == 0f) 0f else x / y }),
+
+    // HARD
+    INC("++", 1, { _, y -> y + 1 }, false, true),
+    DEC("--", 1, { _, y -> y - 1 }, false, true),
     MOD("%", 4, { x, y -> if (y == 0f) 0f else ((x % y) + y) % y }),
 
     // ADVANCED
@@ -32,15 +33,24 @@ enum class OPERATOR(
     MIN("min", 2, { x, y -> minOf(x, y) }),
     ABS_DIFF("|-|", 2, { x, y -> kotlin.math.abs(x - y) }),
     CLAMP("clamp", 2, { x, y -> x.coerceIn(0f, y) }),
-    SWAP("swap", 2, { x, y -> y - x }),
     LOG2("log2", 1, { _, y -> if (y <= 0f) 0f else log2(y) }, false, true)
 }
 
 val EASY = arrayOf(0, 2)
-val MEDIUM = arrayOf(EASY[0] + 1, EASY[1] + 5)
-val ADVANCE = arrayOf(MEDIUM[0] + 1, MEDIUM[1] + 8)
+val MEDIUM = arrayOf(EASY[1] + 1, EASY[1] + 2)
+val HARD = arrayOf(MEDIUM[1] + 1, MEDIUM[1] + 3)
+val ADVANCE = arrayOf(HARD[1] + 1, HARD[1] + 7)
 
-val numberRange = 1 until 1000
+val numberRangeEasy = 1 until 50
+val numberRangeMedium = 1 until 200
+val numberRangeHard = 1 until 1000
+val numberRangeAdvance = 1 until 1000
+
+val operandCountEasy = 3
+val operandCountMedium = 3
+val operandCountHard = 3
+val operandCountAdvance = 3
+
 val includeFloatNumbers = false
 
 val maxResult = 10_000
@@ -130,16 +140,25 @@ class MathQuestionFactory(
     fun getNextQuestion(difficulty: Difficulty = Difficulty.MIX): Node {
 
         val operandCount = when (difficulty) {
-            Difficulty.EASY -> 2
-            Difficulty.MEDIUM, Difficulty.HARD, Difficulty.MIX -> 3
-            Difficulty.ADVANCE -> 4
+            Difficulty.EASY -> operandCountEasy
+            Difficulty.MEDIUM -> operandCountMedium
+            Difficulty.HARD -> operandCountHard
+            Difficulty.ADVANCE -> operandCountAdvance
+            Difficulty.MIX -> operandCountMedium
         }
         val operatorRange = when (difficulty) {
             Difficulty.EASY -> EASY[0] until EASY[1]
             Difficulty.MEDIUM -> EASY[0] until MEDIUM[1]
-            Difficulty.HARD -> MEDIUM[0] until MEDIUM[1]
-            Difficulty.ADVANCE -> ADVANCE[0] until ADVANCE[1]
-            Difficulty.MIX -> EASY[0] until ADVANCE[0]
+            Difficulty.HARD -> EASY[0] until HARD[1]
+            Difficulty.ADVANCE -> MEDIUM[0] until ADVANCE[1]
+            Difficulty.MIX -> EASY[0] until ADVANCE[1]
+        }
+        val numberRange = when (difficulty) {
+            Difficulty.EASY -> numberRangeEasy
+            Difficulty.MEDIUM -> numberRangeMedium
+            Difficulty.HARD -> numberRangeHard
+            Difficulty.ADVANCE -> numberRangeAdvance
+            Difficulty.MIX -> numberRangeEasy.first until numberRangeAdvance.last
         }
         val operators = Array(operandCount - 1) { OPERATOR.entries[operatorRange.random()] }
 
@@ -187,7 +206,7 @@ class MathQuestionFactory(
         }
         val root = nodes.single()
         val result = root.eval()
-        if (result > maxResult || result < -maxResult) {
+        if (result > maxResult || result < -maxResult || (result > -1 && result < 1)) {
             return getNextQuestion()
         }
         return root

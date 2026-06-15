@@ -23,7 +23,7 @@ fun AlarmItem(
     modifier: Modifier = Modifier
 ) {
     // TODO: bug where once alarms cause others to look disabled in the list
-    var running by remember {
+    var running by remember(alarm.id(), alarm.running) {
         mutableStateOf(alarm.running)
     }
     Card(modifier) {

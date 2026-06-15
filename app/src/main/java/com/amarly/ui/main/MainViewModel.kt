@@ -102,6 +102,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setRootFolder(uri: Uri) {
         repo.setRootFolder(uri)
+        loadAlarms()
     }
 
 }
